@@ -63,7 +63,7 @@ attorney makes all case-specific decisions. See [docs/HUMAN_IN_THE_LOOP.md](docs
 | AI | Anthropic Claude `claude-opus-4-8` via `@anthropic-ai/sdk` |
 | Env management | dotenv |
 
-Languages supported: English (EN), Spanish (ES), Arabic (AR, RTL), French (FR), Ukrainian (UK).
+Languages supported: **the AI guidance responds in ~100 languages** chosen by relevance to asylum seekers (see `data/languages.json`), selectable from the language picker. The **app interface (buttons, labels) is fully translated into 5** — English (EN), Spanish (ES), Arabic (AR, RTL), French (FR), Ukrainian (UK) — and falls back to English for the rest while the guidance itself stays in the user's chosen language. RTL layout is applied automatically for right-to-left scripts (Arabic, Dari, Pashto, Persian, Urdu, Sorani Kurdish, Sindhi, Uyghur, Hebrew, Syriac).
 
 ---
 

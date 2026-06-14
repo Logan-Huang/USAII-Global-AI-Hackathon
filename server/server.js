@@ -35,6 +35,8 @@ app.get('/api/geocode', apiLimiter, async (req, res) => {
     const q = typeof req.query.q === 'string' ? req.query.q : '';
     const result = await geocode(q);
     if (!result) return res.status(404).json({ error: 'not_found' });
+    // Coordinates for a place name are stable — let the browser cache them.
+    res.set('Cache-Control', 'public, max-age=86400');
     res.json(result);
   } catch (err) {
     console.error('[geocode] error:', (err && err.message) || 'Error');
@@ -52,6 +54,9 @@ app.get('/api/places', apiLimiter, async (req, res) => {
       return res.status(400).json({ error: 'bad_coords' });
     }
     const list = await places(lat, lon, radius);
+    // Nearby POIs change slowly; a short browser cache avoids re-hitting Overpass
+    // when the user reopens the map for the same spot.
+    res.set('Cache-Control', 'public, max-age=900');
     res.json({ count: list.length, places: list });
   } catch (err) {
     console.error('[places] error:', (err && err.message) || 'Error');

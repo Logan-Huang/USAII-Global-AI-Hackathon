@@ -89,6 +89,7 @@
     DOM.resourcesFor      = document.getElementById("resources-for");
     DOM.resourcesCloseBtn = document.getElementById("resources-close-btn");
     DOM.resourcesLoading  = document.getElementById("resources-loading");
+    DOM.resourcesLoadingText = document.getElementById("resources-loading-text");
     DOM.resourcesError    = document.getElementById("resources-error");
     DOM.resourcesContent  = document.getElementById("resources-content");
 
@@ -107,25 +108,48 @@
     DOM.mapStatus     = document.getElementById("map-status");
     DOM.mapCanvas     = document.getElementById("map-canvas");
     DOM.mapList       = document.getElementById("map-list");
+    DOM.mapLoading    = document.getElementById("map-loading");
+    DOM.mapLoadingText = document.getElementById("map-loading-text");
   }
 
   /* =========================================================
      Language handling
   ========================================================= */
 
+  // Fallback list if languages.js failed to load (keeps the app usable).
+  var FALLBACK_LANGUAGES = [
+    { code: "en", name: "English", native: "English" },
+    { code: "es", name: "Spanish", native: "Español" },
+    { code: "ar", name: "Arabic", native: "العربية", rtl: true },
+    { code: "fr", name: "French", native: "Français" },
+    { code: "uk", name: "Ukrainian", native: "Українська" },
+  ];
+  function languageList() {
+    return (window.LANGUAGES && window.LANGUAGES.length) ? window.LANGUAGES : FALLBACK_LANGUAGES;
+  }
+  // Look up a language entry by code.
+  function languageEntry(code) {
+    var list = languageList();
+    for (var i = 0; i < list.length; i++) if (list[i].code === code) return list[i];
+    return null;
+  }
+  // RTL if the canonical list flags it; fall back to i18n's known RTL set.
+  function isLangRTL(code) {
+    var e = languageEntry(code);
+    if (e && typeof e.rtl === "boolean") return e.rtl;
+    return i18n.isRTL(code);
+  }
+
   function populateLangSelector() {
-    var options = [
-      { code: "en", label: "English" },
-      { code: "es", label: "Español" },
-      { code: "ar", label: "العربية" },
-      { code: "fr", label: "Français" },
-      { code: "uk", label: "Українська" },
-    ];
     DOM.langSelector.innerHTML = "";
-    options.forEach(function (opt) {
+    languageList().forEach(function (lng) {
       var el = document.createElement("option");
-      el.value = opt.code;
-      el.textContent = opt.label;
+      el.value = lng.code;
+      // Show the native name first (so a speaker recognizes it), then the English
+      // name for staff/helpers. Fall back to the English name alone.
+      el.textContent = (lng.native && lng.native !== lng.name)
+        ? lng.native + " — " + lng.name
+        : lng.name;
       DOM.langSelector.appendChild(el);
     });
     DOM.langSelector.value = state.lang;
@@ -174,7 +198,7 @@
     var t = function (key) { return i18n.t(lang, key); };
 
     // RTL
-    if (i18n.isRTL(lang)) {
+    if (isLangRTL(lang)) {
       document.documentElement.setAttribute("dir", "rtl");
       document.documentElement.setAttribute("lang", lang);
     } else {
@@ -714,8 +738,8 @@
     DOM.resourcesContent.innerHTML = "";
     DOM.resourcesError.textContent = "";
     DOM.resourcesError.style.display = "none";
-    DOM.resourcesLoading.style.display = "block";
-    DOM.resourcesLoading.textContent = t("resourcesLoading");
+    DOM.resourcesLoading.style.display = "flex";
+    DOM.resourcesLoadingText.textContent = t("resourcesLoading");
     DOM.resourcesFor.textContent = t("resourcesSubheading") + " " + country;
 
     DOM.resourcesOverlay.classList.add("open");
@@ -804,12 +828,73 @@
      Map: help near you (Leaflet + OpenStreetMap)
   ========================================================= */
 
-  var mapState = { map: null, layer: null, initialized: false };
+  var mapState = { map: null, layer: null, initialized: false, abort: null, retry: null };
 
-  function setMapStatus(msg, isError) {
-    DOM.mapStatus.textContent = msg || "";
-    DOM.mapStatus.style.display = msg ? "block" : "none";
+  // Search rings (metres). If nothing is found close by we automatically widen
+  // the radius before telling the user "nothing nearby" — important for users in
+  // less-densely-mapped suburban/rural areas where help may be 10–20 km away.
+  var PLACES_RADII = [8000, 16000, 25000];
+
+  // Status line under the header. When `retryFn` is given, a "Try again" button
+  // is appended (used on errors so the user is never left at a dead end).
+  function setMapStatus(msg, isError, retryFn) {
+    DOM.mapStatus.innerHTML = "";
+    if (!msg) {
+      DOM.mapStatus.style.display = "none";
+      DOM.mapStatus.className = "map-status";
+      return;
+    }
     DOM.mapStatus.className = "map-status" + (isError ? " map-status-error" : "");
+    DOM.mapStatus.style.display = "block";
+    var span = document.createElement("span");
+    span.textContent = msg;
+    DOM.mapStatus.appendChild(span);
+    if (retryFn) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "map-retry-btn";
+      btn.textContent = i18n.t(state.lang, "mapRetry");
+      btn.addEventListener("click", retryFn);
+      DOM.mapStatus.appendChild(btn);
+    }
+  }
+
+  /* ---- Loading overlay + skeleton list ---- */
+  function showMapLoading(msg) {
+    DOM.mapLoadingText.textContent = msg || i18n.t(state.lang, "mapSearching");
+    DOM.mapLoading.hidden = false;
+  }
+  function setMapLoadingText(msg) { DOM.mapLoadingText.textContent = msg; }
+  function hideMapLoading() { DOM.mapLoading.hidden = true; }
+
+  function renderMapSkeletons(n) {
+    DOM.mapList.innerHTML = "";
+    for (var i = 0; i < n; i++) {
+      var card = document.createElement("div");
+      card.className = "map-place-skeleton";
+      var l1 = document.createElement("div");
+      l1.className = "skeleton-line";
+      var l2 = document.createElement("div");
+      l2.className = "skeleton-line short";
+      card.appendChild(l1);
+      card.appendChild(l2);
+      DOM.mapList.appendChild(card);
+    }
+  }
+
+  // Abort any in-flight map request and hand back a fresh signal so a stale
+  // response can never overwrite the results of a newer search.
+  function freshMapAbort() {
+    if (mapState.abort) { try { mapState.abort.abort(); } catch (e) {} }
+    mapState.abort = (typeof AbortController !== "undefined") ? new AbortController() : null;
+    return mapState.abort ? mapState.abort.signal : undefined;
+  }
+
+  function handleMapError(err, msg) {
+    if (err && err.name === "AbortError") return; // superseded by a newer request
+    hideMapLoading();
+    DOM.mapList.innerHTML = "";
+    setMapStatus(msg, true, mapState.retry);
   }
 
   function openMapPanel() {
@@ -835,40 +920,63 @@
     var query =
       (state.profile && (state.profile.currentLocation || state.profile.countryOfAsylum)) || "";
     if (query) centerByQuery(query);
-    else setMapStatus("", false);
+    else { hideMapLoading(); setMapStatus("", false); }
   }
 
   function closeMapPanel() {
+    // Cancel any in-flight lookup so it can't pop up after the panel is closed.
+    if (mapState.abort) { try { mapState.abort.abort(); } catch (e) {} mapState.abort = null; }
+    hideMapLoading();
     DOM.mapOverlay.classList.remove("open");
     if (DOM.mapBtn) DOM.mapBtn.focus();
   }
 
   function centerByQuery(query) {
     var t = function (key) { return i18n.t(state.lang, key); };
-    setMapStatus(t("mapSearching"), false);
-    fetch("/api/geocode?q=" + encodeURIComponent(query))
+    mapState.retry = function () { centerByQuery(query); };
+    var signal = freshMapAbort();
+    setMapStatus("", false);
+    showMapLoading(t("mapSearching"));
+    renderMapSkeletons(4);
+    fetch("/api/geocode?q=" + encodeURIComponent(query), { signal: signal })
       .then(function (res) { if (!res.ok) throw new Error("geocode"); return res.json(); })
       .then(function (loc) {
         if (mapState.map) mapState.map.setView([loc.lat, loc.lon], 12);
-        return loadPlaces(loc.lat, loc.lon);
+        // Reuse the same signal so geocode + places cancel together.
+        return loadPlaces(loc.lat, loc.lon, signal);
       })
-      .catch(function () { setMapStatus(t("mapError"), true); });
+      .catch(function (err) { handleMapError(err, t("mapError")); });
   }
 
-  function loadPlaces(lat, lon) {
+  function loadPlaces(lat, lon, signal) {
     var t = function (key) { return i18n.t(state.lang, key); };
-    setMapStatus(t("mapSearching"), false);
+    mapState.retry = function () { loadPlaces(lat, lon, freshMapAbort()); };
+    if (signal === undefined) signal = freshMapAbort();
     if (mapState.layer) mapState.layer.clearLayers();
-    DOM.mapList.innerHTML = "";
-    return fetch("/api/places?lat=" + lat + "&lon=" + lon + "&radius=8000")
-      .then(function (res) { if (!res.ok) throw new Error("places"); return res.json(); })
-      .then(function (data) {
-        var list = (data && data.places) || [];
-        if (list.length === 0) { setMapStatus(t("mapEmpty"), false); return; }
-        setMapStatus("", false);
-        renderPlaces(list);
-      })
-      .catch(function () { setMapStatus(t("mapError"), true); });
+    showMapLoading(t("mapSearching"));
+    renderMapSkeletons(4);
+
+    var idx = 0;
+    function attempt() {
+      var radius = PLACES_RADII[idx];
+      return fetch("/api/places?lat=" + lat + "&lon=" + lon + "&radius=" + radius, { signal: signal })
+        .then(function (res) { if (!res.ok) throw new Error("places"); return res.json(); })
+        .then(function (data) {
+          var list = (data && data.places) || [];
+          // Nothing close by: widen the ring and try again before giving up.
+          if (list.length === 0 && idx < PLACES_RADII.length - 1) {
+            idx++;
+            setMapLoadingText(t("mapExpanding"));
+            return attempt();
+          }
+          hideMapLoading();
+          DOM.mapList.innerHTML = "";
+          if (list.length === 0) { setMapStatus(t("mapEmpty"), false); return; }
+          setMapStatus("", false);
+          renderPlaces(list);
+        });
+    }
+    return attempt().catch(function (err) { handleMapError(err, t("mapError")); });
   }
 
   function buildPopup(p) {
@@ -964,14 +1072,17 @@
   function useMyLocation() {
     var t = function (key) { return i18n.t(state.lang, key); };
     if (!navigator.geolocation) { setMapStatus(t("mapError"), true); return; }
-    setMapStatus(t("mapSearching"), false);
+    mapState.retry = useMyLocation;
+    setMapStatus("", false);
+    showMapLoading(t("mapSearching"));
+    renderMapSkeletons(4);
     navigator.geolocation.getCurrentPosition(
       function (pos) {
         var la = pos.coords.latitude, lo = pos.coords.longitude;
         if (mapState.map) mapState.map.setView([la, lo], 13);
-        loadPlaces(la, lo);
+        loadPlaces(la, lo, freshMapAbort());
       },
-      function () { setMapStatus(t("mapError"), true); },
+      function () { hideMapLoading(); setMapStatus(t("mapError"), true, useMyLocation); },
       { enableHighAccuracy: false, timeout: 10000, maximumAge: 600000 }
     );
   }

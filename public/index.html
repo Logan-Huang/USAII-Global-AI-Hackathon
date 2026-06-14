@@ -234,7 +234,10 @@
         >&times;</button>
       </div>
 
-      <div id="resources-loading" style="display:none"></div>
+      <div id="resources-loading" style="display:none">
+        <div class="spinner" aria-hidden="true"></div>
+        <span id="resources-loading-text"></span>
+      </div>
       <div id="resources-error" style="display:none"></div>
       <div id="resources-content"></div>
     </div>
@@ -254,13 +257,22 @@
         </div>
       </div>
       <div id="map-status" class="map-status"></div>
-      <div id="map-canvas"></div>
+      <div class="map-canvas-wrap">
+        <div id="map-canvas"></div>
+        <!-- Loading overlay: shown over the map while geocoding / fetching places -->
+        <div id="map-loading" class="map-loading" hidden aria-live="polite">
+          <div class="spinner" aria-hidden="true"></div>
+          <p id="map-loading-text" class="map-loading-text">Looking for services near you…</p>
+        </div>
+      </div>
       <div id="map-list"></div>
     </div>
   </div>
 
-  <!-- Scripts: countries + i18n first, Leaflet before app -->
+  <!-- Scripts: countries + languages + UI translations + i18n first, Leaflet before app -->
   <script src="countries.js"></script>
+  <script src="languages.js"></script>
+  <script src="ui-translations.js"></script>
   <script src="i18n.js"></script>
   <script src="vendor/leaflet/leaflet.js"></script>
   <script src="app.js"></script>

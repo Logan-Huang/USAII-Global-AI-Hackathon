@@ -5,13 +5,15 @@
 // the general process and next steps, but simple and natural in any language, and
 // firmly within the human-in-the-loop guardrails (no case adjudication).
 
-const LANG_NAMES = {
-  en: 'English',
-  es: 'Spanish (español)',
-  ar: 'Arabic (العربية)',
-  fr: 'French (français)',
-  uk: 'Ukrainian (українська)',
-};
+// LANG_NAMES maps a language code to the name Claude is told to write in. Built
+// from the canonical list in data/languages.json (the same list that drives the
+// client language picker), so the ~100 supported languages stay in sync. Format:
+// "English name (native endonym)" when a native form is known, else just the name.
+const { languages: SUPPORTED } = require('../data/languages.json');
+const LANG_NAMES = SUPPORTED.reduce((acc, l) => {
+  acc[l.code] = l.native && l.native !== l.name ? `${l.name} (${l.native})` : l.name;
+  return acc;
+}, {});
 
 function formatProfile(profile = {}) {
   const rows = [
