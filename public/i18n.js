@@ -66,6 +66,19 @@
       resourcesLoading: "Loading resources…",
       resourcesNone: "No resources found for this country.",
 
+      // Country dropdown
+      countrySelectPlaceholder: "Select a country…",
+
+      // Map (help near you)
+      mapButton: "Help near me (map)",
+      mapHeading: "Help near you",
+      mapNote: "These places are mapped by the community (OpenStreetMap) and are not verified. For checked asylum help, use “Find legal help.”",
+      mapUseMyLocation: "Use my location",
+      mapSearching: "Looking for services near you…",
+      mapEmpty: "No mapped places found nearby. Please use “Find legal help” for trusted organizations.",
+      mapError: "Could not load the map. Please use “Find legal help” instead.",
+      mapListHeading: "Places on the map",
+
       // Errors
       errorNetwork: "Network error. Please check your connection and try again.",
       errorStream: "The response was interrupted. Please try again.",
@@ -131,6 +144,17 @@
       resourcesLoading: "Cargando recursos…",
       resourcesNone: "No se encontraron recursos para este país.",
 
+      countrySelectPlaceholder: "Seleccione un país…",
+
+      mapButton: "Ayuda cerca de mí (mapa)",
+      mapHeading: "Ayuda cerca de usted",
+      mapNote: "Estos lugares están cartografiados por la comunidad (OpenStreetMap) y no están verificados. Para ayuda de asilo verificada, use «Buscar ayuda legal».",
+      mapUseMyLocation: "Usar mi ubicación",
+      mapSearching: "Buscando servicios cerca de usted…",
+      mapEmpty: "No se encontraron lugares cercanos en el mapa. Use «Buscar ayuda legal» para organizaciones de confianza.",
+      mapError: "No se pudo cargar el mapa. Use «Buscar ayuda legal» en su lugar.",
+      mapListHeading: "Lugares en el mapa",
+
       errorNetwork:
         "Error de red. Verifique su conexión e intente de nuevo.",
       errorStream: "La respuesta fue interrumpida. Intente de nuevo.",
@@ -193,6 +217,17 @@
       resourcesError: "تعذّر تحميل الموارد. يرجى المحاولة مرة أخرى.",
       resourcesLoading: "جارٍ تحميل الموارد…",
       resourcesNone: "لم يتم العثور على موارد لهذا البلد.",
+
+      countrySelectPlaceholder: "اختر بلدًا…",
+
+      mapButton: "مساعدة بالقرب مني (خريطة)",
+      mapHeading: "مساعدة بالقرب منك",
+      mapNote: "هذه الأماكن مرسومة من قبل المجتمع (OpenStreetMap) وغير مُتحقَّق منها. للحصول على مساعدة لجوء موثوقة، استخدم «ابحث عن مساعدة قانونية».",
+      mapUseMyLocation: "استخدم موقعي",
+      mapSearching: "جارٍ البحث عن خدمات بالقرب منك…",
+      mapEmpty: "لم يتم العثور على أماكن قريبة على الخريطة. استخدم «ابحث عن مساعدة قانونية» للمنظمات الموثوقة.",
+      mapError: "تعذّر تحميل الخريطة. استخدم «ابحث عن مساعدة قانونية» بدلاً من ذلك.",
+      mapListHeading: "الأماكن على الخريطة",
 
       errorNetwork: "خطأ في الشبكة. يرجى التحقق من اتصالك والمحاولة مرة أخرى.",
       errorStream: "تمت مقاطعة الرد. يرجى المحاولة مرة أخرى.",
@@ -257,6 +292,17 @@
       resourcesLoading: "Chargement des ressources…",
       resourcesNone: "Aucune ressource trouvée pour ce pays.",
 
+      countrySelectPlaceholder: "Choisissez un pays…",
+
+      mapButton: "Aide près de moi (carte)",
+      mapHeading: "Aide près de vous",
+      mapNote: "Ces lieux sont cartographiés par la communauté (OpenStreetMap) et ne sont pas vérifiés. Pour une aide à l’asile vérifiée, utilisez « Trouver une aide juridique ».",
+      mapUseMyLocation: "Utiliser ma position",
+      mapSearching: "Recherche de services près de vous…",
+      mapEmpty: "Aucun lieu trouvé à proximité sur la carte. Utilisez « Trouver une aide juridique » pour des organisations fiables.",
+      mapError: "Impossible de charger la carte. Utilisez « Trouver une aide juridique » à la place.",
+      mapListHeading: "Lieux sur la carte",
+
       errorNetwork:
         "Erreur réseau. Vérifiez votre connexion et réessayez.",
       errorStream: "La réponse a été interrompue. Veuillez réessayer.",
@@ -320,6 +366,17 @@
       resourcesError: "Не вдалося завантажити ресурси. Спробуйте ще раз.",
       resourcesLoading: "Завантаження ресурсів…",
       resourcesNone: "Для цієї країни ресурси не знайдено.",
+
+      countrySelectPlaceholder: "Виберіть країну…",
+
+      mapButton: "Допомога поруч (карта)",
+      mapHeading: "Допомога поруч із вами",
+      mapNote: "Ці місця нанесені спільнотою (OpenStreetMap) і не перевірені. Для перевіреної допомоги шукачам притулку скористайтеся «Знайти юридичну допомогу».",
+      mapUseMyLocation: "Використати моє місцезнаходження",
+      mapSearching: "Пошук служб поруч із вами…",
+      mapEmpty: "Поблизу не знайдено місць на карті. Скористайтеся «Знайти юридичну допомогу» для надійних організацій.",
+      mapError: "Не вдалося завантажити карту. Скористайтеся «Знайти юридичну допомогу».",
+      mapListHeading: "Місця на карті",
 
       errorNetwork:
         "Помилка мережі. Перевірте з'єднання та спробуйте ще раз.",

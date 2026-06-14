@@ -96,6 +96,17 @@
     DOM.globalError       = document.getElementById("global-error");
     DOM.globalErrorText   = document.getElementById("global-error-text");
     DOM.globalErrorClose  = document.getElementById("global-error-close");
+
+    // Map (help near you)
+    DOM.mapBtn        = document.getElementById("map-btn");
+    DOM.mapOverlay    = document.getElementById("map-overlay");
+    DOM.mapTitle      = document.getElementById("map-title");
+    DOM.mapNote       = document.getElementById("map-note");
+    DOM.mapLocateBtn  = document.getElementById("map-locate-btn");
+    DOM.mapCloseBtn   = document.getElementById("map-close-btn");
+    DOM.mapStatus     = document.getElementById("map-status");
+    DOM.mapCanvas     = document.getElementById("map-canvas");
+    DOM.mapList       = document.getElementById("map-list");
   }
 
   /* =========================================================
@@ -118,6 +129,44 @@
       DOM.langSelector.appendChild(el);
     });
     DOM.langSelector.value = state.lang;
+  }
+
+  /* ---- Country dropdowns (labels localized via Intl.DisplayNames) ---- */
+  var _regionNames = {};
+  function regionNames(lang) {
+    if (!_regionNames[lang]) {
+      try { _regionNames[lang] = new Intl.DisplayNames([lang], { type: "region" }); }
+      catch (e) { _regionNames[lang] = new Intl.DisplayNames(["en"], { type: "region" }); }
+    }
+    return _regionNames[lang];
+  }
+  function codeToEnglishName(code) {
+    if (!code) return "";
+    try { return regionNames("en").of(code) || code; }
+    catch (e) { return code; }
+  }
+  function populateCountrySelect(selectEl, lang) {
+    if (!selectEl || !window.COUNTRY_CODES) return;
+    var prev = selectEl.value; // preserve the selected code across re-localization
+    var dn = regionNames(lang);
+    var items = window.COUNTRY_CODES.map(function (code) {
+      var name;
+      try { name = dn.of(code) || code; } catch (e) { name = code; }
+      return { code: code, name: name };
+    });
+    items.sort(function (a, b) { return a.name.localeCompare(b.name, lang); });
+    selectEl.innerHTML = "";
+    var ph = document.createElement("option");
+    ph.value = "";
+    ph.textContent = i18n.t(lang, "countrySelectPlaceholder");
+    selectEl.appendChild(ph);
+    items.forEach(function (it) {
+      var o = document.createElement("option");
+      o.value = it.code;
+      o.textContent = it.name;
+      selectEl.appendChild(o);
+    });
+    selectEl.value = prev;
   }
 
   function applyLanguage(lang) {
@@ -147,9 +196,9 @@
     DOM.privacyText.textContent       = t("privacyNotice");
 
     DOM.lblOrigin.textContent    = t("countryOfOriginLabel");
-    DOM.inputOrigin.placeholder  = t("countryOfOriginPlaceholder");
+    populateCountrySelect(DOM.inputOrigin, lang);
     DOM.lblAsylum.textContent    = t("countryOfAsylumLabel");
-    DOM.inputAsylum.placeholder  = t("countryOfAsylumPlaceholder");
+    populateCountrySelect(DOM.inputAsylum, lang);
     DOM.lblLocation.textContent  = t("currentLocationLabel");
     DOM.inputLocation.placeholder= t("currentLocationPlaceholder");
     DOM.lblGender.textContent    = t("genderLabel");
@@ -172,6 +221,13 @@
     // Resources modal
     DOM.resourcesTitle.textContent   = t("resourcesHeading");
     DOM.resourcesCloseBtn.setAttribute("aria-label", t("resourcesClose"));
+
+    // Map
+    DOM.mapBtn.textContent           = t("mapButton");
+    DOM.mapTitle.textContent         = t("mapHeading");
+    DOM.mapNote.textContent          = t("mapNote");
+    DOM.mapLocateBtn.textContent     = t("mapUseMyLocation");
+    DOM.mapCloseBtn.setAttribute("aria-label", t("resourcesClose"));
   }
 
   /* =========================================================
@@ -227,6 +283,17 @@
       if (e.key === "Escape") closeResourcesPanel();
     });
 
+    // Map
+    DOM.mapBtn.addEventListener("click", openMapPanel);
+    DOM.mapCloseBtn.addEventListener("click", closeMapPanel);
+    DOM.mapOverlay.addEventListener("click", function (e) {
+      if (e.target === DOM.mapOverlay) closeMapPanel();
+    });
+    DOM.mapLocateBtn.addEventListener("click", useMyLocation);
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") closeMapPanel();
+    });
+
     // Global error close
     DOM.globalErrorClose.addEventListener("click", hideGlobalError);
   }
@@ -252,14 +319,14 @@
   ========================================================= */
 
   function handleIntakeSubmit() {
-    var origin   = DOM.inputOrigin.value.trim();
-    var asylum   = DOM.inputAsylum.value.trim();
+    var originCode = DOM.inputOrigin.value;
+    var asylumCode = DOM.inputAsylum.value;
     var location = DOM.inputLocation.value.trim();
     var gender   = DOM.inputGender.value.trim();
     var civil    = DOM.inputCivil.value.trim();
     var notes    = DOM.inputNotes.value.trim();
 
-    if (!origin || !asylum || !location) {
+    if (!originCode || !asylumCode || !location) {
       showGlobalError(i18n.t(state.lang, "errorRequired"));
       return;
     }
@@ -267,8 +334,8 @@
     hideGlobalError();
 
     state.profile = {
-      countryOfOrigin: origin,
-      countryOfAsylum: asylum,
+      countryOfOrigin: codeToEnglishName(originCode),
+      countryOfAsylum: codeToEnglishName(asylumCode),
       currentLocation: location,
       gender: gender || undefined,
       civilStatus: civil || undefined,
@@ -482,21 +549,25 @@
     // Bold: **text**
     html = html.replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>");
 
-    // Process line-by-line for headings and lists
+    // Process line-by-line for headings and lists.
+    // IMPORTANT: blank lines between list items of the SAME type must NOT break
+    // the list — otherwise each item becomes its own <ol> and restarts at "1.".
     var lines = html.split("\n");
     var output = [];
-    var inUL = false;
-    var inOL = false;
+    var listType = null; // "ol" | "ul" | null
 
     function closeList() {
-      if (inUL) { output.push("</ul>"); inUL = false; }
-      if (inOL) { output.push("</ol>"); inOL = false; }
+      if (listType === "ol") output.push("</ol>");
+      else if (listType === "ul") output.push("</ul>");
+      listType = null;
     }
+    function isOrdered(s) { return /^\s*\d+\.\s+/.test(s); }
+    function isUnordered(s) { return /^\s*[-*]\s+/.test(s); }
 
     for (var i = 0; i < lines.length; i++) {
       var line = lines[i];
 
-      // ## Heading (only H2 per spec)
+      // ## Heading (H2)
       var headingMatch = line.match(/^##\s+(.+)$/);
       if (headingMatch) {
         closeList();
@@ -504,32 +575,40 @@
         continue;
       }
 
-      // Numbered list: "1. item" or "2. item" etc.
-      var olMatch = line.match(/^\d+\.\s+(.+)$/);
+      // Numbered list item
+      var olMatch = line.match(/^\s*\d+\.\s+(.+)$/);
       if (olMatch) {
-        if (inUL) { output.push("</ul>"); inUL = false; }
-        if (!inOL) { output.push("<ol>"); inOL = true; }
+        if (listType !== "ol") { closeList(); output.push("<ol>"); listType = "ol"; }
         output.push("<li>" + olMatch[1] + "</li>");
         continue;
       }
 
-      // Unordered list: "- item" or "* item"
-      var ulMatch = line.match(/^[-*]\s+(.+)$/);
+      // Bulleted list item
+      var ulMatch = line.match(/^\s*[-*]\s+(.+)$/);
       if (ulMatch) {
-        if (inOL) { output.push("</ol>"); inOL = false; }
-        if (!inUL) { output.push("<ul>"); inUL = true; }
+        if (listType !== "ul") { closeList(); output.push("<ul>"); listType = "ul"; }
         output.push("<li>" + ulMatch[1] + "</li>");
         continue;
       }
 
-      // Normal line
-      closeList();
+      // Blank line: keep the list open if it resumes after the blank(s).
       if (line.trim() === "") {
-        // Blank line — close any paragraphs; will render as spacing
-        output.push("");
-      } else {
-        output.push("<p>" + line + "</p>");
+        if (listType) {
+          var j = i + 1;
+          while (j < lines.length && lines[j].trim() === "") j++;
+          if (j < lines.length &&
+              ((listType === "ol" && isOrdered(lines[j])) ||
+               (listType === "ul" && isUnordered(lines[j])))) {
+            continue; // same list continues — do not close it
+          }
+          closeList();
+        }
+        continue;
       }
+
+      // Normal text line
+      closeList();
+      output.push("<p>" + line + "</p>");
     }
 
     closeList();
@@ -719,6 +798,182 @@
   function closeResourcesPanel() {
     DOM.resourcesOverlay.classList.remove("open");
     if (DOM.legalHelpBtn) DOM.legalHelpBtn.focus();
+  }
+
+  /* =========================================================
+     Map: help near you (Leaflet + OpenStreetMap)
+  ========================================================= */
+
+  var mapState = { map: null, layer: null, initialized: false };
+
+  function setMapStatus(msg, isError) {
+    DOM.mapStatus.textContent = msg || "";
+    DOM.mapStatus.style.display = msg ? "block" : "none";
+    DOM.mapStatus.className = "map-status" + (isError ? " map-status-error" : "");
+  }
+
+  function openMapPanel() {
+    var t = function (key) { return i18n.t(state.lang, key); };
+    DOM.mapOverlay.classList.add("open");
+    DOM.mapCloseBtn.focus();
+
+    if (!mapState.initialized) {
+      if (typeof L === "undefined") { setMapStatus(t("mapError"), true); return; }
+      try { L.Icon.Default.imagePath = "vendor/leaflet/images/"; } catch (e) {}
+      mapState.map = L.map("map-canvas", { scrollWheelZoom: true }).setView([20, 0], 2);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: "© OpenStreetMap contributors",
+      }).addTo(mapState.map);
+      mapState.layer = L.layerGroup().addTo(mapState.map);
+      mapState.initialized = true;
+    }
+
+    // Leaflet mis-measures a container that was display:none; fix after it shows.
+    setTimeout(function () { if (mapState.map) mapState.map.invalidateSize(); }, 120);
+
+    var query =
+      (state.profile && (state.profile.currentLocation || state.profile.countryOfAsylum)) || "";
+    if (query) centerByQuery(query);
+    else setMapStatus("", false);
+  }
+
+  function closeMapPanel() {
+    DOM.mapOverlay.classList.remove("open");
+    if (DOM.mapBtn) DOM.mapBtn.focus();
+  }
+
+  function centerByQuery(query) {
+    var t = function (key) { return i18n.t(state.lang, key); };
+    setMapStatus(t("mapSearching"), false);
+    fetch("/api/geocode?q=" + encodeURIComponent(query))
+      .then(function (res) { if (!res.ok) throw new Error("geocode"); return res.json(); })
+      .then(function (loc) {
+        if (mapState.map) mapState.map.setView([loc.lat, loc.lon], 12);
+        return loadPlaces(loc.lat, loc.lon);
+      })
+      .catch(function () { setMapStatus(t("mapError"), true); });
+  }
+
+  function loadPlaces(lat, lon) {
+    var t = function (key) { return i18n.t(state.lang, key); };
+    setMapStatus(t("mapSearching"), false);
+    if (mapState.layer) mapState.layer.clearLayers();
+    DOM.mapList.innerHTML = "";
+    return fetch("/api/places?lat=" + lat + "&lon=" + lon + "&radius=8000")
+      .then(function (res) { if (!res.ok) throw new Error("places"); return res.json(); })
+      .then(function (data) {
+        var list = (data && data.places) || [];
+        if (list.length === 0) { setMapStatus(t("mapEmpty"), false); return; }
+        setMapStatus("", false);
+        renderPlaces(list);
+      })
+      .catch(function () { setMapStatus(t("mapError"), true); });
+  }
+
+  function buildPopup(p) {
+    var wrap = document.createElement("div");
+    var nm = document.createElement("strong");
+    nm.textContent = p.name;
+    wrap.appendChild(nm);
+    var cat = document.createElement("div");
+    cat.style.fontSize = "0.78rem";
+    cat.style.color = "#4e5868";
+    cat.textContent = p.category;
+    wrap.appendChild(cat);
+    if (p.address) {
+      var ad = document.createElement("div");
+      ad.style.fontSize = "0.78rem";
+      ad.textContent = p.address;
+      wrap.appendChild(ad);
+    }
+    if (p.phone) {
+      var ph = document.createElement("div");
+      ph.style.fontSize = "0.78rem";
+      ph.textContent = p.phone;
+      wrap.appendChild(ph);
+    }
+    if (p.website) {
+      var a = document.createElement("a");
+      a.href = p.website; a.target = "_blank"; a.rel = "noopener noreferrer";
+      a.textContent = "Website";
+      wrap.appendChild(a);
+    }
+    return wrap;
+  }
+
+  function renderPlaces(list) {
+    var t = function (key) { return i18n.t(state.lang, key); };
+
+    list.forEach(function (p) {
+      if (!mapState.layer) return;
+      var marker = L.marker([p.lat, p.lon]);
+      marker.bindPopup(buildPopup(p));
+      mapState.layer.addLayer(marker);
+    });
+
+    var heading = document.createElement("h3");
+    heading.className = "map-list-heading";
+    heading.textContent = t("mapListHeading");
+    DOM.mapList.appendChild(heading);
+
+    list.forEach(function (p) {
+      var item = document.createElement("div");
+      item.className = "map-place";
+
+      var top = document.createElement("div");
+      top.className = "map-place-top";
+      var nm = document.createElement("span");
+      nm.className = "map-place-name";
+      nm.textContent = p.name;
+      var cat = document.createElement("span");
+      cat.className = "map-place-cat";
+      cat.textContent = p.category;
+      top.appendChild(nm);
+      top.appendChild(cat);
+      item.appendChild(top);
+
+      if (p.address) {
+        var addr = document.createElement("div");
+        addr.className = "map-place-meta";
+        addr.textContent = p.address;
+        item.appendChild(addr);
+      }
+      if (p.phone) {
+        var ph = document.createElement("div");
+        ph.className = "map-place-meta";
+        ph.textContent = p.phone;
+        item.appendChild(ph);
+      }
+      if (p.website) {
+        var a = document.createElement("a");
+        a.className = "map-place-link";
+        a.href = p.website;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        a.textContent = p.website.replace(/^https?:\/\//, "").slice(0, 40);
+        item.appendChild(a);
+      }
+      item.addEventListener("click", function () {
+        if (mapState.map) mapState.map.setView([p.lat, p.lon], 16);
+      });
+      DOM.mapList.appendChild(item);
+    });
+  }
+
+  function useMyLocation() {
+    var t = function (key) { return i18n.t(state.lang, key); };
+    if (!navigator.geolocation) { setMapStatus(t("mapError"), true); return; }
+    setMapStatus(t("mapSearching"), false);
+    navigator.geolocation.getCurrentPosition(
+      function (pos) {
+        var la = pos.coords.latitude, lo = pos.coords.longitude;
+        if (mapState.map) mapState.map.setView([la, lo], 13);
+        loadPlaces(la, lo);
+      },
+      function () { setMapStatus(t("mapError"), true); },
+      { enableHighAccuracy: false, timeout: 10000, maximumAge: 600000 }
+    );
   }
 
   /* =========================================================

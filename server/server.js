@@ -9,6 +9,7 @@ const express = require('express');
 const config = require('./config');
 const { applySecurity, apiLimiter, validateChatBody } = require('./security');
 const { getResourcesForCountry } = require('./resources');
+const { geocode, places } = require('./places');
 const { streamChat } = require('./claude');
 
 const app = express();
@@ -26,6 +27,36 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 app.get('/api/resources', apiLimiter, (req, res) => {
   const country = typeof req.query.country === 'string' ? req.query.country : '';
   res.json(getResourcesForCountry(country));
+});
+
+// Geocode a place name into coordinates (for centering the map)
+app.get('/api/geocode', apiLimiter, async (req, res) => {
+  try {
+    const q = typeof req.query.q === 'string' ? req.query.q : '';
+    const result = await geocode(q);
+    if (!result) return res.status(404).json({ error: 'not_found' });
+    res.json(result);
+  } catch (err) {
+    console.error('[geocode] error:', (err && err.message) || 'Error');
+    res.status(502).json({ error: 'geocode_failed' });
+  }
+});
+
+// Find nearby help (NGOs, social facilities, legal aid) around a point
+app.get('/api/places', apiLimiter, async (req, res) => {
+  try {
+    const lat = parseFloat(req.query.lat);
+    const lon = parseFloat(req.query.lon);
+    const radius = parseFloat(req.query.radius);
+    if (!isFinite(lat) || !isFinite(lon)) {
+      return res.status(400).json({ error: 'bad_coords' });
+    }
+    const list = await places(lat, lon, radius);
+    res.json({ count: list.length, places: list });
+  } catch (err) {
+    console.error('[places] error:', (err && err.message) || 'Error');
+    res.status(502).json({ error: 'places_failed' });
+  }
 });
 
 // 5) Streaming chat (newline-delimited JSON)
