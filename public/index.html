@@ -4,8 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="AI-Powered Asylum Aid — confidential plain-language guidance for asylum seekers." />
-  <!-- No external resources; all styles are local -->
+  <!-- Map styles (Leaflet, vendored locally — no CDN) -->
   <title>Asylum Aid</title>
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -73,32 +74,20 @@
         <form id="intake-form" novalidate aria-labelledby="intake-heading">
           <div class="form-grid">
 
-            <!-- Country of origin — required -->
+            <!-- Country of origin — required (dropdown) -->
             <div class="form-field">
               <label id="lbl-origin" for="input-origin">Country of origin</label>
-              <input
-                type="text"
-                id="input-origin"
-                name="countryOfOrigin"
-                autocomplete="country-name"
-                required
-                aria-required="true"
-                placeholder="e.g. Afghanistan"
-              />
+              <select id="input-origin" name="countryOfOrigin" required aria-required="true">
+                <option value="">Select a country…</option>
+              </select>
             </div>
 
-            <!-- Country of asylum — required -->
+            <!-- Country of asylum — required (dropdown) -->
             <div class="form-field">
               <label id="lbl-asylum" for="input-asylum">Country where you are seeking protection</label>
-              <input
-                type="text"
-                id="input-asylum"
-                name="countryOfAsylum"
-                autocomplete="country-name"
-                required
-                aria-required="true"
-                placeholder="e.g. United States"
-              />
+              <select id="input-asylum" name="countryOfAsylum" required aria-required="true">
+                <option value="">Select a country…</option>
+              </select>
             </div>
 
             <!-- Current location — required -->
@@ -179,6 +168,9 @@
           <button id="legal-help-btn" class="btn-secondary" type="button">
             Find legal help
           </button>
+          <button id="map-btn" class="btn-secondary" type="button">
+            Help near me (map)
+          </button>
           <button id="new-session-btn" class="btn-ghost" type="button">
             Start over
           </button>
@@ -248,8 +240,29 @@
     </div>
   </div>
 
-  <!-- Scripts: i18n first (sets window.i18n), then app -->
+  <!-- ===================== MAP MODAL (help near you) ===================== -->
+  <div id="map-overlay" role="dialog" aria-modal="true" aria-labelledby="map-title">
+    <div id="map-panel">
+      <div class="resources-header">
+        <div>
+          <h2 id="map-title">Help near you</h2>
+          <p id="map-note" class="map-note"></p>
+        </div>
+        <div class="map-header-actions">
+          <button id="map-locate-btn" type="button" class="btn-secondary">Use my location</button>
+          <button id="map-close-btn" type="button" aria-label="Close">&times;</button>
+        </div>
+      </div>
+      <div id="map-status" class="map-status"></div>
+      <div id="map-canvas"></div>
+      <div id="map-list"></div>
+    </div>
+  </div>
+
+  <!-- Scripts: countries + i18n first, Leaflet before app -->
+  <script src="countries.js"></script>
   <script src="i18n.js"></script>
+  <script src="vendor/leaflet/leaflet.js"></script>
   <script src="app.js"></script>
 
 </body>

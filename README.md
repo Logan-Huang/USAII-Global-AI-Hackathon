@@ -43,6 +43,7 @@ with an AI assistant that:
 2. Delivers a personalized, step-by-step checklist and immediate next steps.
 3. Links to authoritative official and legal-aid resources for their destination.
 4. Routes them to qualified human attorneys and legal-aid organizations.
+5. Shows an interactive map of nearby help (NGOs, legal aid, community services) around their location.
 
 The application is **not a lawyer**. It provides legal information, not legal advice. A human
 attorney makes all case-specific decisions. See [docs/HUMAN_IN_THE_LOOP.md](docs/HUMAN_IN_THE_LOOP.md).
@@ -57,6 +58,8 @@ attorney makes all case-specific decisions. See [docs/HUMAN_IN_THE_LOOP.md](docs
 | Backend | Node.js >=18, Express 5 |
 | Security headers | Helmet |
 | Rate limiting | express-rate-limit |
+| Maps | Leaflet (vendored, no CDN) + OpenStreetMap tiles & Overpass API |
+| Geocoding | Open-Meteo Geocoding API |
 | AI | Anthropic Claude `claude-opus-4-8` via `@anthropic-ai/sdk` |
 | Env management | dotenv |
 
