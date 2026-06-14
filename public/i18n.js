@@ -1,7 +1,14 @@
 /**
  * i18n.js — UI string translations for AI-Powered Asylum Aid
- * Covers: en, es, ar, fr, uk
- * All keys in the "en" object are canonical; other languages fall back to en.
+ *
+ * Hand-written, reviewed set: en, es, ar, fr, uk (below). English is canonical.
+ * Every other canonical language (data/languages.json, ~100 codes) is filled in
+ * by MACHINE translations from public/ui-translations.js (window.UI_TRANSLATIONS,
+ * loaded just before this file). Those are merged UNDER the hand-written set, so
+ * a reviewed language always wins. Any string still missing falls back to English.
+ *
+ * To regenerate the machine set after editing the English strings:
+ *     node scripts/gen-ui-translations.js
  */
 (function (global) {
   "use strict";
@@ -77,6 +84,8 @@
       mapSearching: "Looking for services near you…",
       mapEmpty: "No mapped places found nearby. Please use “Find legal help” for trusted organizations.",
       mapError: "Could not load the map. Please use “Find legal help” instead.",
+      mapExpanding: "Nothing close by — widening the search area…",
+      mapRetry: "Try again",
       mapListHeading: "Places on the map",
 
       // Errors
@@ -153,6 +162,8 @@
       mapSearching: "Buscando servicios cerca de usted…",
       mapEmpty: "No se encontraron lugares cercanos en el mapa. Use «Buscar ayuda legal» para organizaciones de confianza.",
       mapError: "No se pudo cargar el mapa. Use «Buscar ayuda legal» en su lugar.",
+      mapExpanding: "Nada cerca: ampliando el área de búsqueda…",
+      mapRetry: "Reintentar",
       mapListHeading: "Lugares en el mapa",
 
       errorNetwork:
@@ -227,6 +238,8 @@
       mapSearching: "جارٍ البحث عن خدمات بالقرب منك…",
       mapEmpty: "لم يتم العثور على أماكن قريبة على الخريطة. استخدم «ابحث عن مساعدة قانونية» للمنظمات الموثوقة.",
       mapError: "تعذّر تحميل الخريطة. استخدم «ابحث عن مساعدة قانونية» بدلاً من ذلك.",
+      mapExpanding: "لا يوجد شيء قريب — جارٍ توسيع منطقة البحث…",
+      mapRetry: "حاول مرة أخرى",
       mapListHeading: "الأماكن على الخريطة",
 
       errorNetwork: "خطأ في الشبكة. يرجى التحقق من اتصالك والمحاولة مرة أخرى.",
@@ -301,6 +314,8 @@
       mapSearching: "Recherche de services près de vous…",
       mapEmpty: "Aucun lieu trouvé à proximité sur la carte. Utilisez « Trouver une aide juridique » pour des organisations fiables.",
       mapError: "Impossible de charger la carte. Utilisez « Trouver une aide juridique » à la place.",
+      mapExpanding: "Rien à proximité — élargissement de la zone de recherche…",
+      mapRetry: "Réessayer",
       mapListHeading: "Lieux sur la carte",
 
       errorNetwork:
@@ -376,6 +391,8 @@
       mapSearching: "Пошук служб поруч із вами…",
       mapEmpty: "Поблизу не знайдено місць на карті. Скористайтеся «Знайти юридичну допомогу» для надійних організацій.",
       mapError: "Не вдалося завантажити карту. Скористайтеся «Знайти юридичну допомогу».",
+      mapExpanding: "Поблизу нічого немає — розширюємо зону пошуку…",
+      mapRetry: "Спробувати ще раз",
       mapListHeading: "Місця на карті",
 
       errorNetwork:
@@ -391,8 +408,31 @@
     },
   };
 
-  var SUPPORTED_LANGUAGES = ["en", "es", "ar", "fr", "uk"];
-  var RTL_LANGUAGES = ["ar"];
+  // Hand-written, reviewed languages — these always take priority on merge.
+  var HAND_WRITTEN = ["en", "es", "ar", "fr", "uk"];
+
+  // Merge the machine-generated translations (public/ui-translations.js) UNDER the
+  // hand-written set: only add a language we don't already have by hand. Per-key
+  // gaps still fall back to English via t().
+  var GENERATED = global.UI_TRANSLATIONS || {};
+  Object.keys(GENERATED).forEach(function (code) {
+    if (!TRANSLATIONS[code]) TRANSLATIONS[code] = GENERATED[code];
+  });
+
+  // Everything we can render the UI in: hand-written first (canonical order),
+  // then the generated languages.
+  var SUPPORTED_LANGUAGES = HAND_WRITTEN.concat(
+    Object.keys(TRANSLATIONS).filter(function (c) {
+      return HAND_WRITTEN.indexOf(c) === -1;
+    })
+  );
+
+  // RTL set: derive from the canonical language list (loaded before this file as
+  // window.LANGUAGES) so every right-to-left script is covered, not just Arabic.
+  var RTL_LANGUAGES = (global.LANGUAGES || [])
+    .filter(function (l) { return l && l.rtl; })
+    .map(function (l) { return l.code; });
+  if (RTL_LANGUAGES.indexOf("ar") === -1) RTL_LANGUAGES.push("ar");
 
   /**
    * Detect the best supported language from navigator.language.

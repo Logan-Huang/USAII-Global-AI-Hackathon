@@ -15,6 +15,10 @@ const UA =
 // friendly (Nominatim blocks many server IPs). Used for place name -> coords.
 const GEOCODER = 'https://geocoding-api.open-meteo.com/v1/search';
 // Overpass mirrors, tried in order (the main instance can be busy / rate-limit).
+// NOTE: every mirror here must carry GLOBAL OSM data. Regional instances (e.g.
+// overpass.osm.ch = Switzerland only) must NOT be added: because we race mirrors
+// with Promise.any, a regional instance returns a fast empty 200 that wins the
+// race and yields "0 results" everywhere outside its region.
 const OVERPASS_ENDPOINTS = [
   'https://overpass-api.de/api/interpreter',
   'https://overpass.kumi.systems/api/interpreter',
