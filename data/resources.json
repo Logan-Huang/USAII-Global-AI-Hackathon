@@ -1,0 +1,141 @@
+{
+  "global": [
+    {
+      "name": "UNHCR Help",
+      "url": "https://help.unhcr.org/",
+      "description": "Country-by-country guidance for refugees and asylum seekers, in many languages."
+    },
+    {
+      "name": "UNHCR (UN Refugee Agency)",
+      "url": "https://www.unhcr.org/",
+      "description": "Global information on asylum, refugee status, and rights."
+    }
+  ],
+  "countries": {
+    "US": {
+      "name": "United States",
+      "official": [
+        {
+          "name": "USCIS — Asylum",
+          "url": "https://www.uscis.gov/humanitarian/refugees-and-asylum/asylum",
+          "description": "Official U.S. asylum process and forms."
+        },
+        {
+          "name": "EOIR (Immigration Courts), U.S. DOJ",
+          "url": "https://www.justice.gov/eoir",
+          "description": "Immigration court information and procedures."
+        }
+      ],
+      "legalAid": [
+        {
+          "name": "ImmigrationLawHelp.org",
+          "url": "https://www.immigrationlawhelp.org/",
+          "description": "Directory of free/low-cost nonprofit immigration legal providers, searchable by location."
+        },
+        {
+          "name": "LawHelp.org",
+          "url": "https://www.lawhelp.org/",
+          "description": "Find free legal aid and information by state."
+        },
+        {
+          "name": "ASAP (Asylum Seeker Advocacy Project)",
+          "url": "https://asaptogether.org/",
+          "description": "Online community and resources for asylum seekers."
+        },
+        {
+          "name": "RAICES",
+          "url": "https://www.raicestexas.org/",
+          "description": "Free and low-cost legal services for immigrants and refugees."
+        },
+        {
+          "name": "ILRC (Immigrant Legal Resource Center)",
+          "url": "https://www.ilrc.org/",
+          "description": "Immigration legal resources and referrals."
+        }
+      ]
+    },
+    "GB": {
+      "name": "United Kingdom",
+      "official": [
+        {
+          "name": "Claim asylum in the UK (GOV.UK)",
+          "url": "https://www.gov.uk/claim-asylum",
+          "description": "Official UK asylum application process."
+        }
+      ],
+      "legalAid": [
+        {
+          "name": "Refugee Council",
+          "url": "https://www.refugeecouncil.org.uk/",
+          "description": "Advice and support for refugees and asylum seekers in the UK."
+        },
+        {
+          "name": "Right to Remain",
+          "url": "https://righttoremain.org.uk/",
+          "description": "Plain-language toolkit explaining the UK asylum and immigration system."
+        }
+      ]
+    },
+    "EU": {
+      "name": "European Union",
+      "official": [
+        {
+          "name": "EUAA (European Union Agency for Asylum)",
+          "url": "https://euaa.europa.eu/",
+          "description": "EU asylum information and country guidance."
+        }
+      ],
+      "legalAid": [
+        {
+          "name": "AIDA (Asylum Information Database)",
+          "url": "https://asylumineurope.org/",
+          "description": "Asylum procedures and reception conditions across Europe."
+        },
+        {
+          "name": "ECRE (European Council on Refugees and Exiles)",
+          "url": "https://ecre.org/",
+          "description": "Network of NGOs assisting refugees in Europe."
+        }
+      ]
+    },
+    "CA": {
+      "name": "Canada",
+      "official": [
+        {
+          "name": "IRCC — Claim refugee protection from inside Canada",
+          "url": "https://www.canada.ca/en/immigration-refugees-citizenship/services/refugees/claim-protection-inside-canada.html",
+          "description": "Official Canadian in-country asylum process."
+        }
+      ],
+      "legalAid": [
+        {
+          "name": "Canadian Council for Refugees",
+          "url": "https://ccrweb.ca/",
+          "description": "Refugee and immigrant rights organization with resources and referrals."
+        }
+      ]
+    },
+    "AU": {
+      "name": "Australia",
+      "official": [
+        {
+          "name": "Department of Home Affairs",
+          "url": "https://immi.homeaffairs.gov.au/",
+          "description": "Official Australian visa and protection information."
+        }
+      ],
+      "legalAid": [
+        {
+          "name": "Refugee Council of Australia",
+          "url": "https://www.refugeecouncil.org.au/",
+          "description": "Peak body with information and referrals."
+        },
+        {
+          "name": "RACS (Refugee Advice & Casework Service)",
+          "url": "https://www.racs.org.au/",
+          "description": "Free legal help for people seeking asylum."
+        }
+      ]
+    }
+  }
+}
