@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="AI-Powered Asylum Aid — confidential plain-language guidance for asylum seekers." />
+  <!-- No external resources; all styles are local -->
+  <title>Asylum Aid</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ============================================================
+       DISCLAIMER BANNER — always visible, sticky
+  ============================================================ -->
+  <div id="disclaimer-banner" role="banner" aria-label="Legal disclaimer">
+    <span id="disclaimer-text">
+      This tool provides general information, not legal advice. Always confirm with a qualified attorney.
+    </span>
+  </div>
+
+  <!-- ============================================================
+       APP HEADER
+  ============================================================ -->
+  <header id="app-header">
+    <div class="brand">
+      <div class="brand-icon" aria-hidden="true">&#9878;</div>
+      <div>
+        <h1>Asylum Aid</h1>
+        <span class="subtitle">USAII Global AI Hackathon 2026</span>
+      </div>
+    </div>
+
+    <div id="lang-selector-wrap">
+      <label id="lang-selector-label" for="lang-selector">Language</label>
+      <select id="lang-selector" aria-label="Select language">
+        <!-- Populated by app.js -->
+      </select>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       MAIN CONTENT
+  ============================================================ -->
+  <main id="app-main" role="main">
+
+    <!-- ===================== GLOBAL ERROR BAR ===================== -->
+    <div id="global-error" role="alert" aria-live="assertive">
+      <span id="global-error-text"></span>
+      <button id="global-error-close" aria-label="Dismiss error">&times;</button>
+    </div>
+
+    <!-- ===================== SCREEN 1: INTAKE FORM ===================== -->
+    <section id="intake-screen" aria-label="Intake form">
+
+      <div class="card">
+        <!-- Privacy notice -->
+        <div class="privacy-notice" role="note">
+          <span class="privacy-icon" aria-hidden="true">&#128274;</span>
+          <div>
+            <strong id="privacy-heading">Your Privacy</strong>
+            <p id="privacy-text">
+              We do not store your information. Nothing you type is saved or shared with any government.
+            </p>
+          </div>
+        </div>
+
+        <h2 id="intake-heading" class="screen-heading">Tell us about your situation</h2>
+        <p id="intake-subheading" class="screen-subheading">
+          Your answers help us give you relevant, plain-language guidance. All fields marked (optional) are voluntary.
+        </p>
+
+        <form id="intake-form" novalidate aria-labelledby="intake-heading">
+          <div class="form-grid">
+
+            <!-- Country of origin — required -->
+            <div class="form-field">
+              <label id="lbl-origin" for="input-origin">Country of origin</label>
+              <input
+                type="text"
+                id="input-origin"
+                name="countryOfOrigin"
+                autocomplete="country-name"
+                required
+                aria-required="true"
+                placeholder="e.g. Afghanistan"
+              />
+            </div>
+
+            <!-- Country of asylum — required -->
+            <div class="form-field">
+              <label id="lbl-asylum" for="input-asylum">Country where you are seeking protection</label>
+              <input
+                type="text"
+                id="input-asylum"
+                name="countryOfAsylum"
+                autocomplete="country-name"
+                required
+                aria-required="true"
+                placeholder="e.g. United States"
+              />
+            </div>
+
+            <!-- Current location — required -->
+            <div class="form-field field-full">
+              <label id="lbl-location" for="input-location">Current location (city or country)</label>
+              <input
+                type="text"
+                id="input-location"
+                name="currentLocation"
+                autocomplete="address-level2"
+                required
+                aria-required="true"
+                placeholder="e.g. New York, USA"
+              />
+            </div>
+
+            <!-- Gender — optional -->
+            <div class="form-field">
+              <label id="lbl-gender" for="input-gender">
+                Gender <span class="optional-badge">(optional)</span>
+              </label>
+              <input
+                type="text"
+                id="input-gender"
+                name="gender"
+                placeholder="e.g. Female, Male, Non-binary"
+              />
+            </div>
+
+            <!-- Civil status — optional -->
+            <div class="form-field">
+              <label id="lbl-civil" for="input-civil">
+                Civil status <span class="optional-badge">(optional)</span>
+              </label>
+              <input
+                type="text"
+                id="input-civil"
+                name="civilStatus"
+                placeholder="e.g. Single, Married, Widowed"
+              />
+            </div>
+
+            <!-- Notes — optional, full width -->
+            <div class="form-field field-full">
+              <label id="lbl-notes" for="input-notes">
+                Briefly describe your situation <span class="optional-badge">(optional)</span>
+              </label>
+              <textarea
+                id="input-notes"
+                name="notes"
+                rows="3"
+                placeholder="e.g. I fled conflict in my home country and arrived here two weeks ago."
+              ></textarea>
+            </div>
+
+          </div><!-- /form-grid -->
+
+          <p id="required-note" class="required-note">
+            Fields without "(optional)" are required.
+          </p>
+
+          <button type="submit" id="submit-btn" class="btn-primary">
+            Get guidance
+          </button>
+        </form>
+      </div>
+
+    </section>
+    <!-- /INTAKE SCREEN -->
+
+    <!-- ===================== SCREEN 2: CHAT ===================== -->
+    <section id="chat-screen" class="hidden" aria-label="Guidance chat">
+
+      <!-- Toolbar -->
+      <div class="chat-toolbar">
+        <h2 id="chat-title" class="chat-title">Your guidance session</h2>
+        <div class="chat-toolbar-actions">
+          <button id="legal-help-btn" class="btn-secondary" type="button">
+            Find legal help
+          </button>
+          <button id="new-session-btn" class="btn-ghost" type="button">
+            Start over
+          </button>
+        </div>
+      </div>
+
+      <!-- Messages area -->
+      <div
+        id="chat-messages"
+        role="log"
+        aria-live="polite"
+        aria-label="Conversation"
+        tabindex="0"
+      >
+        <!-- Messages injected by app.js -->
+      </div>
+
+      <!-- Typing / streaming indicator (inside the log area) -->
+      <div id="typing-indicator" aria-hidden="true" class="">
+        <div class="typing-dots" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </div>
+        <span id="typing-text">Generating response…</span>
+      </div>
+
+      <!-- Input area -->
+      <div class="chat-input-area">
+        <label for="chat-input" class="sr-only">Your message</label>
+        <textarea
+          id="chat-input"
+          name="message"
+          rows="1"
+          placeholder="Ask a follow-up question…"
+          aria-label="Type your message"
+        ></textarea>
+        <button id="send-btn" type="button">Send</button>
+      </div>
+
+    </section>
+    <!-- /CHAT SCREEN -->
+
+  </main>
+
+  <!-- ===================== RESOURCES MODAL ===================== -->
+  <div
+    id="resources-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="resources-title"
+  >
+    <div id="resources-panel">
+      <div class="resources-header">
+        <div>
+          <h2 id="resources-title">Legal Help &amp; Resources</h2>
+          <p id="resources-for" class="resources-for"></p>
+        </div>
+        <button
+          id="resources-close-btn"
+          type="button"
+          aria-label="Close"
+        >&times;</button>
+      </div>
+
+      <div id="resources-loading" style="display:none"></div>
+      <div id="resources-error" style="display:none"></div>
+      <div id="resources-content"></div>
+    </div>
+  </div>
+
+  <!-- Scripts: i18n first (sets window.i18n), then app -->
+  <script src="i18n.js"></script>
+  <script src="app.js"></script>
+
+</body>
+</html>
