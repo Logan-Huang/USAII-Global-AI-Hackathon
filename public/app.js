@@ -37,9 +37,11 @@
     cacheDOMRefs();
     state.lang = i18n.detectLanguage();
     populateLangSelector();
-    applyLanguage(state.lang);
+    buildLangGate();
     bindEvents();
+    applyLanguage(state.lang);
     showIntake();
+    openLangGate(); // prompt for language as soon as the page loads
   });
 
   /* =========================================================
@@ -110,6 +112,13 @@
     DOM.mapList       = document.getElementById("map-list");
     DOM.mapLoading    = document.getElementById("map-loading");
     DOM.mapLoadingText = document.getElementById("map-loading-text");
+
+    // Language gate (shown on load)
+    DOM.langOverlay    = document.getElementById("lang-overlay");
+    DOM.langGateTitle  = document.getElementById("lang-gate-title");
+    DOM.langGateSub    = document.getElementById("lang-gate-sub");
+    DOM.langGateSearch = document.getElementById("lang-gate-search");
+    DOM.langGateList   = document.getElementById("lang-gate-list");
   }
 
   /* =========================================================
@@ -193,6 +202,92 @@
     selectEl.value = prev;
   }
 
+  /* ---- Gender / civil status dropdowns ---- */
+  var GENDER_OPTIONS = [
+    { value: "Female", key: "genderFemale" },
+    { value: "Male", key: "genderMale" },
+    { value: "Non-binary", key: "genderNonBinary" },
+    { value: "Prefer not to say", key: "genderPreferNot" },
+  ];
+  var CIVIL_OPTIONS = [
+    { value: "Single", key: "civilSingle" },
+    { value: "Married", key: "civilMarried" },
+    { value: "Divorced", key: "civilDivorced" },
+    { value: "Widowed", key: "civilWidowed" },
+    { value: "Separated", key: "civilSeparated" },
+    { value: "Prefer not to say", key: "civilPreferNot" },
+  ];
+  // Populate an optional choice <select> with a localized placeholder + options.
+  // Values are stable (English) so a selection survives a language switch; only
+  // the visible labels re-localize.
+  function populateChoiceSelect(selectEl, options, lang) {
+    if (!selectEl) return;
+    var prev = selectEl.value;
+    selectEl.innerHTML = "";
+    var ph = document.createElement("option");
+    ph.value = "";
+    ph.textContent = i18n.t(lang, "choosePlaceholder");
+    selectEl.appendChild(ph);
+    options.forEach(function (opt) {
+      var o = document.createElement("option");
+      o.value = opt.value;
+      o.textContent = i18n.t(lang, opt.key);
+      selectEl.appendChild(o);
+    });
+    selectEl.value = prev;
+  }
+
+  /* ---- Language gate (full language picker shown on load) ---- */
+  function buildLangGate() {
+    if (!DOM.langGateList) return;
+    DOM.langGateList.innerHTML = "";
+    languageList().forEach(function (lng) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "lang-gate-item";
+      btn.setAttribute("role", "option");
+      btn.setAttribute("data-code", lng.code);
+      btn.setAttribute(
+        "data-search",
+        ((lng.native || "") + " " + (lng.name || "")).toLowerCase()
+      );
+      if (lng.code === state.lang) btn.setAttribute("aria-selected", "true");
+      var nat = document.createElement("span");
+      nat.className = "lang-gate-native";
+      nat.textContent = lng.native || lng.name;
+      btn.appendChild(nat);
+      if (lng.native && lng.native !== lng.name) {
+        var en = document.createElement("span");
+        en.className = "lang-gate-en";
+        en.textContent = lng.name;
+        btn.appendChild(en);
+      }
+      DOM.langGateList.appendChild(btn);
+    });
+  }
+
+  function filterLangGate(q) {
+    q = (q || "").toLowerCase().trim();
+    var items = DOM.langGateList.querySelectorAll(".lang-gate-item");
+    for (var i = 0; i < items.length; i++) {
+      var hay = items[i].getAttribute("data-search") || "";
+      items[i].style.display = (!q || hay.indexOf(q) !== -1) ? "" : "none";
+    }
+  }
+
+  function openLangGate() {
+    if (!DOM.langOverlay) return;
+    DOM.langOverlay.classList.add("open");
+    if (DOM.langGateSearch) { DOM.langGateSearch.value = ""; filterLangGate(""); }
+    setTimeout(function () { if (DOM.langGateSearch) DOM.langGateSearch.focus(); }, 60);
+  }
+
+  function closeLangGate() {
+    if (!DOM.langOverlay) return;
+    DOM.langOverlay.classList.remove("open");
+    if (DOM.inputOrigin) DOM.inputOrigin.focus();
+  }
+
   function applyLanguage(lang) {
     state.lang = lang;
     var t = function (key) { return i18n.t(lang, key); };
@@ -213,6 +308,11 @@
     DOM.langSelectorLabel.textContent = t("languageLabel");
     DOM.langSelector.value = lang;
 
+    // Language gate
+    if (DOM.langGateTitle) DOM.langGateTitle.textContent = t("langGateTitle");
+    if (DOM.langGateSub) DOM.langGateSub.textContent = t("langGateSub");
+    if (DOM.langGateSearch) DOM.langGateSearch.setAttribute("placeholder", t("langGateSearch"));
+
     // Intake
     DOM.intakeHeading.textContent     = t("intakeHeading");
     DOM.intakeSubheading.textContent  = t("intakeSubheading");
@@ -226,9 +326,9 @@
     DOM.lblLocation.textContent  = t("currentLocationLabel");
     DOM.inputLocation.placeholder= t("currentLocationPlaceholder");
     DOM.lblGender.textContent    = t("genderLabel");
-    DOM.inputGender.placeholder  = t("genderPlaceholder");
+    populateChoiceSelect(DOM.inputGender, GENDER_OPTIONS, lang);
     DOM.lblCivil.textContent     = t("civilStatusLabel");
-    DOM.inputCivil.placeholder   = t("civilStatusPlaceholder");
+    populateChoiceSelect(DOM.inputCivil, CIVIL_OPTIONS, lang);
     DOM.lblNotes.textContent     = t("notesLabel");
     DOM.inputNotes.placeholder   = t("notesPlaceholder");
     DOM.submitBtn.textContent    = t("submitButton");
@@ -316,6 +416,30 @@
     DOM.mapLocateBtn.addEventListener("click", useMyLocation);
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape") closeMapPanel();
+    });
+
+    // Language gate
+    if (DOM.langGateList) {
+      DOM.langGateList.addEventListener("click", function (e) {
+        var btn = e.target.closest ? e.target.closest(".lang-gate-item") : null;
+        if (!btn) return;
+        var code = btn.getAttribute("data-code");
+        if (code) applyLanguage(code);
+        closeLangGate();
+      });
+    }
+    if (DOM.langGateSearch) {
+      DOM.langGateSearch.addEventListener("input", function () { filterLangGate(this.value); });
+    }
+    if (DOM.langOverlay) {
+      DOM.langOverlay.addEventListener("click", function (e) {
+        if (e.target === DOM.langOverlay) closeLangGate(); // accept the current language
+      });
+    }
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && DOM.langOverlay && DOM.langOverlay.classList.contains("open")) {
+        closeLangGate();
+      }
     });
 
     // Global error close

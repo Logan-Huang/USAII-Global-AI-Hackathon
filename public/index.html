@@ -104,30 +104,24 @@
               />
             </div>
 
-            <!-- Gender — optional -->
+            <!-- Gender — optional (dropdown) -->
             <div class="form-field">
               <label id="lbl-gender" for="input-gender">
                 Gender <span class="optional-badge">(optional)</span>
               </label>
-              <input
-                type="text"
-                id="input-gender"
-                name="gender"
-                placeholder="e.g. Female, Male, Non-binary"
-              />
+              <select id="input-gender" name="gender">
+                <option value="">Select… (optional)</option>
+              </select>
             </div>
 
-            <!-- Civil status — optional -->
+            <!-- Civil status — optional (dropdown) -->
             <div class="form-field">
               <label id="lbl-civil" for="input-civil">
                 Civil status <span class="optional-badge">(optional)</span>
               </label>
-              <input
-                type="text"
-                id="input-civil"
-                name="civilStatus"
-                placeholder="e.g. Single, Married, Widowed"
-              />
+              <select id="input-civil" name="civilStatus">
+                <option value="">Select… (optional)</option>
+              </select>
             </div>
 
             <!-- Notes — optional, full width -->
@@ -266,6 +260,19 @@
         </div>
       </div>
       <div id="map-list"></div>
+    </div>
+  </div>
+
+  <!-- ===================== LANGUAGE GATE (shown on load) ===================== -->
+  <div id="lang-overlay" role="dialog" aria-modal="true" aria-labelledby="lang-gate-title">
+    <div id="lang-gate-panel">
+      <div class="lang-gate-header">
+        <div class="lang-gate-globe" aria-hidden="true">🌐</div>
+        <h2 id="lang-gate-title">Choose your language</h2>
+        <p id="lang-gate-sub">Pick the language you understand best. You can change it anytime.</p>
+      </div>
+      <input id="lang-gate-search" type="text" autocomplete="off" placeholder="Search languages…" aria-label="Search languages" />
+      <div id="lang-gate-list" role="listbox" aria-label="Languages"></div>
     </div>
   </div>
 

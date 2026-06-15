@@ -88,6 +88,24 @@
       mapRetry: "Try again",
       mapListHeading: "Places on the map",
 
+      // Gender / civil status dropdowns
+      choosePlaceholder: "Select… (optional)",
+      genderFemale: "Female",
+      genderMale: "Male",
+      genderNonBinary: "Non-binary",
+      genderPreferNot: "Prefer not to say",
+      civilSingle: "Single",
+      civilMarried: "Married",
+      civilDivorced: "Divorced",
+      civilWidowed: "Widowed",
+      civilSeparated: "Separated",
+      civilPreferNot: "Prefer not to say",
+
+      // Language gate (shown on load)
+      langGateTitle: "Choose your language",
+      langGateSub: "Pick the language you understand best. You can change it anytime.",
+      langGateSearch: "Search languages…",
+
       // Errors
       errorNetwork: "Network error. Please check your connection and try again.",
       errorStream: "The response was interrupted. Please try again.",
@@ -166,6 +184,22 @@
       mapRetry: "Reintentar",
       mapListHeading: "Lugares en el mapa",
 
+      choosePlaceholder: "Seleccione… (opcional)",
+      genderFemale: "Femenino",
+      genderMale: "Masculino",
+      genderNonBinary: "No binario",
+      genderPreferNot: "Prefiero no decirlo",
+      civilSingle: "Soltero/a",
+      civilMarried: "Casado/a",
+      civilDivorced: "Divorciado/a",
+      civilWidowed: "Viudo/a",
+      civilSeparated: "Separado/a",
+      civilPreferNot: "Prefiero no decirlo",
+
+      langGateTitle: "Elija su idioma",
+      langGateSub: "Elija el idioma que mejor entienda. Puede cambiarlo cuando quiera.",
+      langGateSearch: "Buscar idiomas…",
+
       errorNetwork:
         "Error de red. Verifique su conexión e intente de nuevo.",
       errorStream: "La respuesta fue interrumpida. Intente de nuevo.",
@@ -241,6 +275,22 @@
       mapExpanding: "لا يوجد شيء قريب — جارٍ توسيع منطقة البحث…",
       mapRetry: "حاول مرة أخرى",
       mapListHeading: "الأماكن على الخريطة",
+
+      choosePlaceholder: "اختر… (اختياري)",
+      genderFemale: "أنثى",
+      genderMale: "ذكر",
+      genderNonBinary: "غير ثنائي",
+      genderPreferNot: "أفضّل عدم الإفصاح",
+      civilSingle: "أعزب/عزباء",
+      civilMarried: "متزوج/ة",
+      civilDivorced: "مطلّق/ة",
+      civilWidowed: "أرمل/ة",
+      civilSeparated: "منفصل/ة",
+      civilPreferNot: "أفضّل عدم الإفصاح",
+
+      langGateTitle: "اختر لغتك",
+      langGateSub: "اختر اللغة التي تفهمها بشكل أفضل. يمكنك تغييرها في أي وقت.",
+      langGateSearch: "ابحث عن اللغات…",
 
       errorNetwork: "خطأ في الشبكة. يرجى التحقق من اتصالك والمحاولة مرة أخرى.",
       errorStream: "تمت مقاطعة الرد. يرجى المحاولة مرة أخرى.",
@@ -318,6 +368,22 @@
       mapRetry: "Réessayer",
       mapListHeading: "Lieux sur la carte",
 
+      choosePlaceholder: "Sélectionnez… (facultatif)",
+      genderFemale: "Femme",
+      genderMale: "Homme",
+      genderNonBinary: "Non-binaire",
+      genderPreferNot: "Je préfère ne pas répondre",
+      civilSingle: "Célibataire",
+      civilMarried: "Marié(e)",
+      civilDivorced: "Divorcé(e)",
+      civilWidowed: "Veuf/Veuve",
+      civilSeparated: "Séparé(e)",
+      civilPreferNot: "Je préfère ne pas répondre",
+
+      langGateTitle: "Choisissez votre langue",
+      langGateSub: "Choisissez la langue que vous comprenez le mieux. Vous pourrez la changer à tout moment.",
+      langGateSearch: "Rechercher des langues…",
+
       errorNetwork:
         "Erreur réseau. Vérifiez votre connexion et réessayez.",
       errorStream: "La réponse a été interrompue. Veuillez réessayer.",
@@ -394,6 +460,22 @@
       mapExpanding: "Поблизу нічого немає — розширюємо зону пошуку…",
       mapRetry: "Спробувати ще раз",
       mapListHeading: "Місця на карті",
+
+      choosePlaceholder: "Виберіть… (необов'язково)",
+      genderFemale: "Жінка",
+      genderMale: "Чоловік",
+      genderNonBinary: "Небінарна особа",
+      genderPreferNot: "Волію не вказувати",
+      civilSingle: "Неодружений/а",
+      civilMarried: "Одружений/а",
+      civilDivorced: "Розлучений/а",
+      civilWidowed: "Вдівець/Вдова",
+      civilSeparated: "Проживає окремо",
+      civilPreferNot: "Волію не вказувати",
+
+      langGateTitle: "Виберіть свою мову",
+      langGateSub: "Виберіть мову, яку розумієте найкраще. Її можна змінити будь-коли.",
+      langGateSearch: "Пошук мов…",
 
       errorNetwork:
         "Помилка мережі. Перевірте з'єднання та спробуйте ще раз.",
