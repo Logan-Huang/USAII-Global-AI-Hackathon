@@ -1105,6 +1105,111 @@ body {
   #map-panel { padding: 16px; }
 }
 
+/* ---- Language gate (shown on load) ---- */
+#lang-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(10,15,30,.6);
+  z-index: 300;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+#lang-overlay.open { display: flex; }
+
+#lang-gate-panel {
+  background: var(--c-surface);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  max-width: 460px;
+  width: 100%;
+  max-height: 86vh;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: var(--shadow-lg);
+}
+
+.lang-gate-header { text-align: center; }
+.lang-gate-globe { font-size: 2rem; line-height: 1; }
+#lang-gate-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--c-text);
+  margin-top: 4px;
+}
+#lang-gate-sub {
+  font-size: 0.85rem;
+  color: var(--c-text-muted);
+  margin-top: 4px;
+  line-height: 1.45;
+}
+
+#lang-gate-search {
+  border: 1.5px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 0.92rem;
+  font-family: inherit;
+  width: 100%;
+}
+#lang-gate-search:focus {
+  outline: none;
+  border-color: var(--c-primary);
+  box-shadow: 0 0 0 3px rgba(29,95,166,.15);
+}
+
+#lang-gate-list {
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding-right: 2px;
+  min-height: 120px;
+}
+@media (max-width: 460px) {
+  #lang-gate-list { grid-template-columns: 1fr; }
+}
+
+.lang-gate-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  text-align: start;
+  background: var(--c-bg);
+  border: 1.5px solid var(--c-border-light);
+  border-radius: var(--radius-md);
+  padding: 9px 12px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color var(--transition), background var(--transition);
+}
+.lang-gate-item:hover {
+  border-color: var(--c-primary);
+  background: var(--c-primary-light);
+}
+.lang-gate-item:focus-visible {
+  outline: 2px solid var(--c-primary);
+  outline-offset: 2px;
+}
+.lang-gate-item[aria-selected="true"] {
+  border-color: var(--c-primary);
+  background: var(--c-primary-light);
+}
+.lang-gate-native {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--c-text);
+}
+.lang-gate-en {
+  font-size: 0.74rem;
+  color: var(--c-text-muted);
+}
+
+[dir="rtl"] .lang-gate-item { text-align: right; align-items: flex-end; }
+
 /* ---- Global error bar ---- */
 #global-error {
   display: none;
