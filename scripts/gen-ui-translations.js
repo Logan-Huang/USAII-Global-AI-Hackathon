@@ -116,7 +116,23 @@ function extractJson(text) {
     const end = s.lastIndexOf('}');
     if (start !== -1 && end !== -1) s = s.slice(start, end + 1);
   }
-  return JSON.parse(s);
+  try {
+    return JSON.parse(s);
+  } catch (err) {
+    // Some models emit raw newlines/tabs inside string values ("Bad control
+    // character"). Escape literal control chars that fall inside a string and retry.
+    let inStr = false, esc = false, fixed = '';
+    for (const ch of s) {
+      if (esc) { fixed += ch; esc = false; continue; }
+      if (ch === '\\') { fixed += ch; esc = true; continue; }
+      if (ch === '"') { inStr = !inStr; fixed += ch; continue; }
+      if (inStr && ch === '\n') { fixed += '\\n'; continue; }
+      if (inStr && ch === '\r') { fixed += '\\r'; continue; }
+      if (inStr && ch === '\t') { fixed += '\\t'; continue; }
+      fixed += ch;
+    }
+    return JSON.parse(fixed);
+  }
 }
 
 async function translateLanguage(targetLang, enStrings, tokens) {
@@ -125,7 +141,9 @@ async function translateLanguage(targetLang, enStrings, tokens) {
   // and translation needs no extended thinking — keep it deterministic and cheap.
   const res = await client.messages.create({
     model: MODEL,
-    max_tokens: 4096,
+    // Verbose non-Latin scripts (Punjabi, Dzongkha, Syriac…) can exceed 4096
+    // tokens and truncate mid-string; give headroom. Override with UI_TRANS_MAX_TOKENS.
+    max_tokens: parseInt(process.env.UI_TRANS_MAX_TOKENS || '8192', 10),
     messages: [{ role: 'user', content: prompt }],
   });
   const text = (res.content || [])
