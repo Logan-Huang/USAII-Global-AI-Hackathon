@@ -15,7 +15,7 @@ Direction A: Crisis-to-Action Translator
 
 Before submitting, the team must complete the following:
 
-- **Qualifier approval code:** HS26-REDACTED
+- **Qualifier approval code:** DONT LEAK THIS
 - **Team of 2–5 members:** 
   - Team member 1: Yuvraj Manchanda
   - Team member 2: Logan Huang
