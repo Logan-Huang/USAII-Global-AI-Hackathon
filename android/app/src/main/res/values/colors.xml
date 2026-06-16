@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Brand palette mirrored from the web client's styles.css :root tokens. -->
+<resources>
+    <color name="aa_primary">#1D5FA6</color>
+    <color name="aa_primary_dark">#154D8A</color>
+    <color name="aa_bg">#F5F6F8</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="ic_launcher_background">#1D5FA6</color>
+</resources>

@@ -45,6 +45,21 @@ open ios/AsylumAid.xcodeproj             # build/run in Xcode (Simulator hits 12
 - **Contract test:** boot the backend in-process (dummy key), save `/api/resources|geocode|places` JSON to `/tmp/contract_*.json`, then `swiftc ios/AsylumAid/Models/Models.swift ios/CoreTests/contract.swift -o /tmp/contract && /tmp/contract` to decode real responses through the app's structs.
 - **iOS invariants:** keep the responsible-AI UI (disclaimer banner, privacy notice, map "unverified" label, "Find legal help" authoritative); reuse `/api/chat` (don't add a client-side model); update `docs/AI_TOOLS_AND_DATA.md` if you add any Swift package / Apple framework / data source.
 
+### Android app (`android/`)
+
+A native **Kotlin + Jetpack Compose** client of the same backend (no AI/key on-device), mirroring the iOS app one-to-one. See `android/README.md` and `android/MIGRATION_BLUEPRINT.md`.
+
+```
+node scripts/gen-android-strings.js      # re-derive android/app/src/main/assets/strings.json (100 langs) + copy languages.json
+cd android && ./gradlew test             # pure-JVM unit tests (no emulator/SDK); needs Android Studio or `gradle wrapper` to create gradle-wrapper.jar
+cd android && ./gradlew assembleDebug    # build the debug APK
+```
+
+- **Emulator networking:** the app's default `AppConfig.BASE_URL` is `http://10.0.2.2:3000` (the emulator's alias for the host's `127.0.0.1`), allowed by `res/xml/network_security_config.xml` (cleartext is permitted ONLY for loopback/dev hosts). For a device, set the LAN IP and add it there, or use HTTPS.
+- **No IDE/SDK here?** Like the iOS core, the pure-Kotlin core (`model/`, `i18n/LocalizationStore`+`Countries`, `md/MarkdownRenderer`, the `@Serializable` contracts) is unit-tested on the JVM via `./gradlew test` (`app/src/test/.../CoreTest.kt`, dev-only). The Compose UI builds only in Android Studio. `gradle-wrapper.jar` is binary and not committed — Android Studio generates it on first sync.
+- **Android specifics:** map is **osmdroid** (OpenStreetMap tiles — same source as the web Leaflet map, no API key); location is the framework **LocationManager** (no Google Play Services); `minSdk 26`; JSON omits empty optionals via `explicitNulls=false`.
+- **Android invariants:** same as iOS — responsible-AI UI, reuse `/api/chat`, no on-device storage (`allowBackup=false`), no analytics; update `docs/AI_TOOLS_AND_DATA.md` if you add any library / Android framework / data source.
+
 ## Architecture (the big picture)
 
 **Local-proxy pattern.** The browser only ever talks to the local Express server; the server holds the Anthropic API key (`.env`, server-side) and calls Claude. The key never reaches the client. The backend is **stateless and storage-free**: chat history lives in browser memory and is sent in full on every request; nothing is persisted or PII-logged.
@@ -82,4 +97,4 @@ open ios/AsylumAid.xcodeproj             # build/run in Xcode (Simulator hits 12
 - **Disclosure is graded:** `docs/AI_TOOLS_AND_DATA.md` must stay accurate to what the app actually uses (AI models, APIs, libraries, data sources). Update it whenever you add or remove a service or library.
 
 ## Docs map
-`README.md` (entry point + setup) · `SECURITY.md` (threat model + "before you host publicly" hardening checklist) · `docs/PROJECT.md`, `docs/ARCHITECTURE.md`, `docs/HUMAN_IN_THE_LOOP.md`, `docs/RESPONSIBLE_AI.md`, `docs/AI_TOOLS_AND_DATA.md`, `docs/PITCH_VIDEO_SCRIPT.md` (graded submission artifacts) · `ios/README.md` (native iOS app — build/run/architecture).
+`README.md` (entry point + setup) · `SECURITY.md` (threat model + "before you host publicly" hardening checklist) · `docs/PROJECT.md`, `docs/ARCHITECTURE.md`, `docs/HUMAN_IN_THE_LOOP.md`, `docs/RESPONSIBLE_AI.md`, `docs/AI_TOOLS_AND_DATA.md`, `docs/PITCH_VIDEO_SCRIPT.md` (graded submission artifacts) · `ios/README.md` (native iOS app — build/run/architecture) · `android/README.md` + `android/MIGRATION_BLUEPRINT.md` (native Android app — build/run/architecture + the web→native port plan).

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Launcher / OS-facing name only. All in-app strings come from the bundled
+         100-language assets/strings.json via LocalizationStore. -->
+    <string name="app_name">Asylum Aid</string>
+</resources>

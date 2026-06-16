@@ -92,6 +92,31 @@ responsible-AI system prompt is unchanged.
 
 ---
 
+## Android App (native Kotlin / Jetpack Compose client)
+
+A native Android app (`android/`) delivers the same product on Android phones/tablets. Like the
+iOS app, it is a **client of the same backend** — it does **not** add, change, or call any AI
+model itself. All Claude calls still go through `POST /api/chat` on the Express proxy, so the
+Anthropic API key remains server-side and the responsible-AI system prompt is unchanged.
+
+| Component | Purpose | Notes |
+|---|---|---|
+| Kotlin / Jetpack Compose (Google) | Native UI for all screens | First-party Android frameworks; no third-party UI kits |
+| OkHttp (Square) | Calls the backend's four endpoints; streams `/api/chat` NDJSON via `readUtf8Line()` | Apache-2.0 |
+| kotlinx.serialization (JetBrains) | JSON encode/decode of the wire types | Apache-2.0; `explicitNulls=false` omits empty optionals, matching the web client |
+| kotlinx.coroutines (JetBrains) | Structured concurrency for streaming + IO | Apache-2.0 |
+| **osmdroid** | Renders the "Help near you" map | **The map tiles are OpenStreetMap** (`*.tile.openstreetmap.org`) — the *same source as the web client*, no API key, "© OpenStreetMap contributors". Apache-2.0. The place *data* still comes from the backend (Open-Meteo + OSM Overpass), preserving the NGO-before-lawyer ranking |
+| Android **LocationManager** (framework) | Optional "Use my location" button | First-party; user-consented (`ACCESS_FINE_LOCATION`); **no Google Play Services / FusedLocation** dependency, so the app runs on non-GMS devices; coordinates query nearby places and are never stored |
+
+- **No analytics or tracking SDKs**, no Google Maps/Play-Services dependency, and **no on-device
+  storage** of chat or profile data (`allowBackup=false`) — matching the web client's storage-free design.
+- The UI strings (100 languages) and the language list are reused verbatim from the web translation
+  assets via `scripts/gen-android-strings.js`; no new translation service is involved.
+- The map is still labeled **unverified community data**, and the curated "Find legal help" directory
+  remains the authoritative path.
+
+---
+
 ## Data Sources
 
 All data sources used are publicly available. No proprietary, licensed, or private datasets

@@ -33,9 +33,9 @@ process.
 
 ## Solution
 
-A web application — plus a **native iOS app** ([`ios/`](ios/README.md)) that shares the same
-backend — where the user enters their country of origin and current country, then chats
-with an AI assistant that:
+A web application — plus **native iOS** ([`ios/`](ios/README.md)) and **Android**
+([`android/`](android/README.md)) apps that share the same backend — where the user enters
+their country of origin and current country, then chats with an AI assistant that:
 
 1. Explains the asylum process in plain language, in the user's own language.
 2. Delivers a personalized, step-by-step checklist and immediate next steps.
@@ -54,6 +54,7 @@ attorney makes all case-specific decisions. See [docs/HUMAN_IN_THE_LOOP.md](docs
 |---|---|
 | Frontend (web) | Vanilla HTML / CSS / JavaScript (single-page app, no build step) |
 | Frontend (iOS) | Native Swift / SwiftUI client of the same backend ([`ios/`](ios/README.md)); MapKit + CoreLocation |
+| Frontend (Android) | Native Kotlin / Jetpack Compose client of the same backend ([`android/`](android/README.md)); osmdroid (OpenStreetMap) + LocationManager |
 | Backend | Node.js >=18, Express 5 |
 | Security headers | Helmet |
 | Rate limiting | express-rate-limit |
@@ -122,6 +123,15 @@ open `ios/AsylumAid.xcodeproj` in **Xcode**, pick an iOS Simulator, and Run — 
 reaches `127.0.0.1:3000` directly (no signing or deployment needed). Full instructions,
 including running on a physical device, are in [ios/README.md](ios/README.md).
 
+### 6. (Optional) Run the native Android app
+
+A native Kotlin / Jetpack Compose app lives in [`android/`](android/README.md). Start the
+backend (`npm start`), then open `android/` in **Android Studio**, pick an emulator (API 26+),
+and Run — the emulator reaches the host's backend at `10.0.2.2:3000` (the default base URL; no
+signing or deployment needed). Full instructions, the migration blueprint, and how to run on a
+physical device are in [android/README.md](android/README.md) and
+[android/MIGRATION_BLUEPRINT.md](android/MIGRATION_BLUEPRINT.md).
+
 ---
 
 ## Security Notes
@@ -150,6 +160,8 @@ For the full threat model and a "before you host this publicly" hardening checkl
 | [docs/AI_TOOLS_AND_DATA.md](docs/AI_TOOLS_AND_DATA.md) | **Mandatory hackathon disclosure** — all AI tools, APIs, and data sources |
 | [docs/PITCH_VIDEO_SCRIPT.md](docs/PITCH_VIDEO_SCRIPT.md) | Beat-by-beat script for the pitch video |
 | [ios/README.md](ios/README.md) | Native iOS (SwiftUI) app — build, run, and architecture |
+| [android/README.md](android/README.md) | Native Android (Jetpack Compose) app — build, run, and architecture |
+| [android/MIGRATION_BLUEPRINT.md](android/MIGRATION_BLUEPRINT.md) | How the web app was isolated and ported to a native Android client |
 | [SECURITY.md](SECURITY.md) | Threat model and hardening checklist |
 
 **Mandatory disclosure:** [docs/AI_TOOLS_AND_DATA.md](docs/AI_TOOLS_AND_DATA.md) lists every

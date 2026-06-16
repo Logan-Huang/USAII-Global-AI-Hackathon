@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Minimal framework theme (no Material Components library dependency). The real UI
+      is Jetpack Compose; this only styles the window/status bar before Compose draws.
+      Forced light to match the brand (the web/iOS clients are a light theme).
+    -->
+    <style name="Theme.AsylumAid" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@color/aa_primary_dark</item>
+        <item name="android:windowBackground">@color/aa_bg</item>
+        <item name="android:colorPrimary">@color/aa_primary</item>
+    </style>
+</resources>
