@@ -54,6 +54,28 @@ step required.
 
 ---
 
+## Layer 1b — Native iOS client (SwiftUI)
+
+A native iOS app ([`ios/`](../ios/README.md)) is a **second frontend over the same proxy** — it
+reuses every backend route and guardrail unchanged, so the Anthropic key stays server-side and the
+responsible-AI system prompt applies identically. It is a thin client:
+
+- **Networking:** Foundation `URLSession`; the chat stream is read with `URLSession.bytes(_:).lines`
+  (the native equivalent of the browser's NDJSON `TextDecoder` loop). Native HTTP is not subject to
+  CORS, so no backend changes are required.
+- **Map:** Apple **MapKit** renders the "Help near you" map (instead of Leaflet/OSM tiles), but the
+  place *data* still comes from `/api/geocode` + `/api/places`, preserving the NGO-before-lawyer
+  ranking. The map is labeled unverified; the curated "Find legal help" directory stays authoritative.
+- **i18n:** the 100-language UI strings are pre-merged into a bundled `strings.json` by
+  `scripts/gen-ios-strings.js` (hand-written wins → machine → English), mirroring the web `t()` chain.
+- **State:** in-memory only (no on-device storage), matching the web client.
+
+Connectivity: the iOS Simulator reaches the dev backend at `127.0.0.1:3000` directly (an
+`NSAllowsLocalNetworking` ATS exception permits the loopback HTTP call); a physical device uses the
+Mac's LAN IP (`HOST=0.0.0.0 npm start`) or a deployed HTTPS host via one constant in `AppConfig.swift`.
+
+---
+
 ## Layer 2 — Backend Proxy
 
 **Technology:** Node.js (>=18) with Express 5.

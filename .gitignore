@@ -21,3 +21,10 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+
+# Xcode / iOS (AsylumAid.xcodeproj itself IS committed; ignore per-user + build clutter)
+**/xcuserdata/
+*.xcuserstate
+DerivedData/
+build/
+.swiftpm/

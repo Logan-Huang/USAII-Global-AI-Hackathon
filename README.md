@@ -33,7 +33,8 @@ process.
 
 ## Solution
 
-A web application where the user enters their country of origin and current country, then chats
+A web application — plus a **native iOS app** ([`ios/`](ios/README.md)) that shares the same
+backend — where the user enters their country of origin and current country, then chats
 with an AI assistant that:
 
 1. Explains the asylum process in plain language, in the user's own language.
@@ -51,7 +52,8 @@ attorney makes all case-specific decisions. See [docs/HUMAN_IN_THE_LOOP.md](docs
 
 | Layer | Technology |
 |---|---|
-| Frontend | Vanilla HTML / CSS / JavaScript (single-page app, no build step) |
+| Frontend (web) | Vanilla HTML / CSS / JavaScript (single-page app, no build step) |
+| Frontend (iOS) | Native Swift / SwiftUI client of the same backend ([`ios/`](ios/README.md)); MapKit + CoreLocation |
 | Backend | Node.js >=18, Express 5 |
 | Security headers | Helmet |
 | Rate limiting | express-rate-limit |
@@ -113,6 +115,13 @@ CLAUDE_MODEL=claude-haiku-4-5    # cheapest and fastest
 
 Switch back to `claude-opus-4-8` for the demo recording and final submission.
 
+### 5. (Optional) Run the native iOS app
+
+A native SwiftUI app lives in [`ios/`](ios/README.md). Start the backend (`npm start`), then
+open `ios/AsylumAid.xcodeproj` in **Xcode**, pick an iOS Simulator, and Run — the Simulator
+reaches `127.0.0.1:3000` directly (no signing or deployment needed). Full instructions,
+including running on a physical device, are in [ios/README.md](ios/README.md).
+
 ---
 
 ## Security Notes
@@ -140,6 +149,7 @@ For the full threat model and a "before you host this publicly" hardening checkl
 | [docs/RESPONSIBLE_AI.md](docs/RESPONSIBLE_AI.md) | Risk register and responsible AI mitigations |
 | [docs/AI_TOOLS_AND_DATA.md](docs/AI_TOOLS_AND_DATA.md) | **Mandatory hackathon disclosure** — all AI tools, APIs, and data sources |
 | [docs/PITCH_VIDEO_SCRIPT.md](docs/PITCH_VIDEO_SCRIPT.md) | Beat-by-beat script for the pitch video |
+| [ios/README.md](ios/README.md) | Native iOS (SwiftUI) app — build, run, and architecture |
 | [SECURITY.md](SECURITY.md) | Threat model and hardening checklist |
 
 **Mandatory disclosure:** [docs/AI_TOOLS_AND_DATA.md](docs/AI_TOOLS_AND_DATA.md) lists every

@@ -68,6 +68,30 @@ vetted asylum help.
 
 ---
 
+## iOS App (native SwiftUI client)
+
+A native iOS app (`ios/`) delivers the same product on iPhone/iPad. It is a **client of the same
+backend** — it does **not** add, change, or call any AI model itself. All Claude calls still go
+through `POST /api/chat` on the Express proxy, so the Anthropic API key remains server-side and the
+responsible-AI system prompt is unchanged.
+
+| Component | Purpose | Notes |
+|---|---|---|
+| Swift / SwiftUI (Apple) | Native UI for all screens | First-party Apple frameworks; no third-party UI packages |
+| Foundation `URLSession` | Calls the backend's four endpoints; streams `/api/chat` NDJSON | First-party; no networking libraries added |
+| Apple **MapKit** | Renders the "Help near you" map (Apple Maps tiles) | **New external service, iOS only** — replaces the browser's OpenStreetMap tiles. The place *data* still comes from the backend (Open-Meteo + OSM Overpass), preserving the NGO-before-lawyer ranking |
+| Apple **CoreLocation** | Optional "Use my location" button | First-party; user-consented (`NSLocationWhenInUseUsageDescription`); coordinates query nearby places and are never stored |
+| XcodeGen (dev only) | Generates the Xcode project from `ios/project.yml` | Build-time tool; not shipped in the app binary |
+
+- **No analytics or tracking SDKs**, no third-party Swift packages, and **no on-device storage** of
+  chat or profile data — matching the web client's storage-free design.
+- The UI strings (100 languages) and the language list are reused verbatim from the web translation
+  assets via `scripts/gen-ios-strings.js`; no new translation service is involved.
+- The map is still labeled **unverified community data**, and the curated "Find legal help" directory
+  remains the authoritative path.
+
+---
+
 ## Data Sources
 
 All data sources used are publicly available. No proprietary, licensed, or private datasets
