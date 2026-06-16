@@ -15,15 +15,12 @@ Direction A: Crisis-to-Action Translator
 
 Before submitting, the team must complete the following:
 
-- **Qualifier approval code:** [TODO: enter the code obtained during the June 7–10 qualification
-  phase. Submissions without a valid code are disqualified.]
-- **Team of 2–5 members:** [TODO: list all team member names below. Solo submissions are
-  automatically disqualified.]
-  - Team member 1: [TODO]
-  - Team member 2: [TODO]
-  - Team member 3: [TODO] (if applicable)
-  - Team member 4: [TODO] (if applicable)
-  - Team member 5: [TODO] (if applicable)
+- **Qualifier approval code:** HS26-REDACTED
+- **Team of 2–5 members:** 
+  - Team member 1: Yuvraj Manchanda
+  - Team member 2: Logan Huang
+  - Team member 3: Rohan Bhamidipati
+  - Team member 4: Finn Gorsline
 
 ---
 
