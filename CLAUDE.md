@@ -31,6 +31,20 @@ node -e 'process.env.ANTHROPIC_API_KEY="x"; const app=require("./server/server")
 - `/api/chat` needs a real key. With a dummy key it returns a clean NDJSON `{"type":"error"}` (a 401 → caught → user-safe message); that is the normal way to exercise the error path.
 - Pure browser logic (e.g. `renderMarkdown`) can be extracted from `public/app.js` text and `eval`'d in Node to unit-test it without a browser. Leaflet rendering itself is browser-only — verify visually.
 
+### iOS app (`ios/`)
+
+A native SwiftUI client of this same backend (no AI/key on-device). See `ios/README.md`.
+
+```
+node scripts/gen-ios-strings.js          # re-derive ios/AsylumAid/Resources/strings.json (100 langs) + copy languages.json
+cd ios && xcodegen generate              # regenerate AsylumAid.xcodeproj after adding/removing files (needs `brew install xcodegen`)
+open ios/AsylumAid.xcodeproj             # build/run in Xcode (Simulator hits 127.0.0.1:3000 directly)
+```
+
+- **No full Xcode here?** The Foundation-only core (models, `LocalizationStore`, `MarkdownRenderer`, `APIClient`/`ChatStream`) compiles and tests with the macOS Swift toolchain — `swiftc <core files> ios/CoreTests/main.swift -o /tmp/coretest && /tmp/coretest`. The SwiftUI views build only in Xcode. `ios/CoreTests/` is dev-only and excluded from the app target.
+- **Contract test:** boot the backend in-process (dummy key), save `/api/resources|geocode|places` JSON to `/tmp/contract_*.json`, then `swiftc ios/AsylumAid/Models/Models.swift ios/CoreTests/contract.swift -o /tmp/contract && /tmp/contract` to decode real responses through the app's structs.
+- **iOS invariants:** keep the responsible-AI UI (disclaimer banner, privacy notice, map "unverified" label, "Find legal help" authoritative); reuse `/api/chat` (don't add a client-side model); update `docs/AI_TOOLS_AND_DATA.md` if you add any Swift package / Apple framework / data source.
+
 ## Architecture (the big picture)
 
 **Local-proxy pattern.** The browser only ever talks to the local Express server; the server holds the Anthropic API key (`.env`, server-side) and calls Claude. The key never reaches the client. The backend is **stateless and storage-free**: chat history lives in browser memory and is sent in full on every request; nothing is persisted or PII-logged.
@@ -68,4 +82,4 @@ node -e 'process.env.ANTHROPIC_API_KEY="x"; const app=require("./server/server")
 - **Disclosure is graded:** `docs/AI_TOOLS_AND_DATA.md` must stay accurate to what the app actually uses (AI models, APIs, libraries, data sources). Update it whenever you add or remove a service or library.
 
 ## Docs map
-`README.md` (entry point + setup) · `SECURITY.md` (threat model + "before you host publicly" hardening checklist) · `docs/PROJECT.md`, `docs/ARCHITECTURE.md`, `docs/HUMAN_IN_THE_LOOP.md`, `docs/RESPONSIBLE_AI.md`, `docs/AI_TOOLS_AND_DATA.md`, `docs/PITCH_VIDEO_SCRIPT.md` (graded submission artifacts).
+`README.md` (entry point + setup) · `SECURITY.md` (threat model + "before you host publicly" hardening checklist) · `docs/PROJECT.md`, `docs/ARCHITECTURE.md`, `docs/HUMAN_IN_THE_LOOP.md`, `docs/RESPONSIBLE_AI.md`, `docs/AI_TOOLS_AND_DATA.md`, `docs/PITCH_VIDEO_SCRIPT.md` (graded submission artifacts) · `ios/README.md` (native iOS app — build/run/architecture).
