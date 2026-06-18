@@ -8,31 +8,39 @@ import androidx.compose.ui.unit.dp
 
 /** Brand palette and metrics, ported from the web client's `styles.css` :root tokens. */
 object AA {
-    val bg = Color(0xFFF5F6F8)
+    val bg = Color(0xFFEEF1F6)
     val surface = Color(0xFFFFFFFF)
-    val border = Color(0xFFD8DDE6)
-    val borderLight = Color(0xFFE8ECF2)
+    val surfaceAlt = Color(0xFFF6F8FB) // subtle inset surface
+    val border = Color(0xFFD2DAE6)
+    val borderLight = Color(0xFFE5EAF1)
 
-    val primary = Color(0xFF1D5FA6) // deep trustworthy blue
-    val primaryDark = Color(0xFF154D8A)
-    val primaryLight = Color(0xFFDCE8F7)
+    val ink = Color(0xFF0C2742)  // institutional navy (header/footer)
+    val ink2 = Color(0xFF103253)
 
-    val accent = Color(0xFF2E7D52) // calm green for positive actions
-    val accentDark = Color(0xFF245F3E)
-    val accentLight = Color(0xFFD4EDDF)
+    val primary = Color(0xFF16548F) // deep trustworthy blue
+    val primaryDark = Color(0xFF0F3D6B)
+    val primaryLight = Color(0xFFE2ECF7)
 
-    val warningBg = Color(0xFFFFF8E6)
-    val warningBorder = Color(0xFFE5C000)
-    val warningText = Color(0xFF7A5700)
+    val gold = Color(0xFFC6A14B) // seal gold (official accent)
+    val goldDark = Color(0xFFA8842F)
 
-    val errorBg = Color(0xFFFDF2F2)
-    val errorBorder = Color(0xFFD94F4F)
-    val errorText = Color(0xFF8B1C1C)
+    val accent = Color(0xFF1F7A4D) // measured green for positive actions
+    val accentDark = Color(0xFF155E3A)
+    val accentLight = Color(0xFFD9EFE2)
 
-    val text = Color(0xFF1A1F2E)
-    val textMuted = Color(0xFF4E5868)
+    val warningBg = Color(0xFFFDF6E3)
+    val warningBorder = Color(0xFFD4A017)
+    val warningStrong = Color(0xFFB07D12)
+    val warningText = Color(0xFF6E4F08)
 
-    val chatUserBg = Color(0xFF1D5FA6)
+    val errorBg = Color(0xFFFDF1F1)
+    val errorBorder = Color(0xFFCF4040)
+    val errorText = Color(0xFF8A1C1C)
+
+    val text = Color(0xFF16202E)
+    val textMuted = Color(0xFF51607A)
+
+    val chatUserBg = Color(0xFF16548F)
     val chatAiBg = Color(0xFFFFFFFF)
 }
 

@@ -15,8 +15,20 @@
        DISCLAIMER BANNER — always visible, sticky
   ============================================================ -->
   <div id="disclaimer-banner" role="banner" aria-label="Legal disclaimer">
-    <span id="disclaimer-text">
-      This tool provides general information, not legal advice. Always confirm with a qualified attorney.
+    <span class="disclaimer-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 3.2 21.2 19.5a1 1 0 0 1-.87 1.5H3.67a1 1 0 0 1-.87-1.5L12 3.2Z"
+              fill="currentColor" opacity="0.16"/>
+        <path d="M12 3.2 21.2 19.5a1 1 0 0 1-.87 1.5H3.67a1 1 0 0 1-.87-1.5L12 3.2Z"
+              stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+        <path d="M12 9.3v4.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <circle cx="12" cy="16.7" r="1.1" fill="currentColor"/>
+      </svg>
+    </span>
+    <span class="disclaimer-body">
+      <span id="disclaimer-text">
+        This tool provides general information, not legal advice. Always confirm with a qualified attorney.
+      </span>
     </span>
   </div>
 
@@ -207,6 +219,18 @@
     <!-- /CHAT SCREEN -->
 
   </main>
+
+  <!-- ============================================================
+       FOOTER — reiterates the binding legal notice
+  ============================================================ -->
+  <footer id="app-footer">
+    <div class="footer-inner">
+      <span class="footer-brand">&#9878; Asylum Aid</span>
+      <p id="footer-note">
+        This tool provides general information, not legal advice. Always confirm with a qualified attorney.
+      </p>
+    </div>
+  </footer>
 
   <!-- ===================== RESOURCES MODAL ===================== -->
   <div

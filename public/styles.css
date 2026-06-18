@@ -1,6 +1,8 @@
 /* ============================================================
    AI-Powered Asylum Aid — Stylesheet
-   Design goals: calm, trustworthy, readable, mobile-first
+   Design goals: institutional, trustworthy, authoritative, readable.
+   An official-feeling legal-aid service: deep navy + seal gold,
+   a serif wordmark, and prominent, formal legal notices.
    No external dependencies; system font stack throughout.
    ============================================================ */
 
@@ -14,19 +16,19 @@
 html {
   font-size: 16px;
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, "Noto Sans", sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji";
-  background-color: #f5f6f8;
-  color: #1a1f2e;
+  font-family: var(--font-sans);
+  background-color: var(--c-bg);
+  color: var(--c-text);
   line-height: 1.6;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 /* RTL support */
@@ -36,110 +38,157 @@ body {
 
 /* ---- Colour tokens ---- */
 :root {
-  --c-bg:           #f5f6f8;
+  /* Typography */
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji";
+  --font-serif:
+    "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua",
+    Georgia, "Times New Roman", "Noto Serif", serif;
+
+  /* Neutrals */
+  --c-bg:           #eef1f6;   /* cool, paper-like field */
   --c-surface:      #ffffff;
-  --c-border:       #d8dde6;
-  --c-border-light: #e8ecf2;
+  --c-surface-alt:  #f6f8fb;   /* subtle inset surface (inputs, list items) */
+  --c-border:       #d2dae6;
+  --c-border-light: #e5eaf1;
 
-  --c-primary:      #1d5fa6;   /* deep trustworthy blue */
-  --c-primary-dark: #154d8a;
-  --c-primary-light:#dce8f7;
+  /* Institutional navy — the brand authority colour */
+  --c-ink:          #0c2742;   /* header / footer ground */
+  --c-ink-2:        #103253;   /* gradient end / hover */
 
-  --c-accent:       #2e7d52;   /* calm green for positive actions */
-  --c-accent-dark:  #245f3e;
-  --c-accent-light: #d4eddf;
+  --c-primary:      #16548f;   /* deep trustworthy blue (links, actions) */
+  --c-primary-dark: #0f3d6b;
+  --c-primary-light:#e2ecf7;
 
-  --c-warning-bg:   #fff8e6;
-  --c-warning-border:#e5c000;
-  --c-warning-text: #7a5700;
+  /* Seal gold — used sparingly for official accents */
+  --c-gold:         #c6a14b;
+  --c-gold-dark:    #a8842f;
 
-  --c-error-bg:     #fdf2f2;
-  --c-error-border: #d94f4f;
-  --c-error-text:   #8b1c1c;
+  --c-accent:       #1f7a4d;   /* measured green for positive actions */
+  --c-accent-dark:  #155e3a;
+  --c-accent-light: #d9efe2;
 
-  --c-text:         #1a1f2e;
-  --c-text-muted:   #4e5868;
+  /* Formal legal-notice amber */
+  --c-warning-bg:    #fdf6e3;
+  --c-warning-border:#d4a017;
+  --c-warning-strong:#b07d12;
+  --c-warning-text:  #6e4f08;
+
+  --c-error-bg:     #fdf1f1;
+  --c-error-border: #cf4040;
+  --c-error-text:   #8a1c1c;
+
+  --c-text:         #16202e;
+  --c-text-muted:   #51607a;
   --c-text-inverse: #ffffff;
 
-  --c-chat-user-bg: #1d5fa6;
+  --c-chat-user-bg: #16548f;
   --c-chat-user-text: #ffffff;
   --c-chat-ai-bg:   #ffffff;
-  --c-chat-ai-text: #1a1f2e;
+  --c-chat-ai-text: #16202e;
 
   --radius-sm: 6px;
   --radius-md: 10px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
 
-  --shadow-sm: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.05);
-  --shadow-md: 0 4px 12px rgba(0,0,0,.10), 0 2px 4px rgba(0,0,0,.06);
-  --shadow-lg: 0 10px 30px rgba(0,0,0,.12), 0 4px 8px rgba(0,0,0,.08);
+  --shadow-sm: 0 1px 2px rgba(16,40,75,.06), 0 1px 3px rgba(16,40,75,.07);
+  --shadow-md: 0 4px 14px rgba(16,40,75,.10), 0 2px 6px rgba(16,40,75,.06);
+  --shadow-lg: 0 18px 48px rgba(12,30,60,.22), 0 6px 14px rgba(12,30,60,.12);
 
   --transition: 0.18s ease;
 }
 
-/* ---- Disclaimer banner ---- */
+/* ---- Disclaimer banner — formal, prominent legal notice ---- */
 #disclaimer-banner {
   background-color: var(--c-warning-bg);
-  border-bottom: 2px solid var(--c-warning-border);
-  padding: 10px 20px;
-  text-align: center;
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--c-warning-text);
+  border-bottom: 1px solid var(--c-warning-border);
+  box-shadow: inset 0 -3px 0 var(--c-warning-strong);
+  padding: 9px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   position: sticky;
   top: 0;
   z-index: 100;
   line-height: 1.4;
 }
 
-#disclaimer-banner span {
-  display: inline-block;
-  max-width: 72ch;
+.disclaimer-icon {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--c-warning-strong);
 }
 
-/* ---- App header ---- */
+.disclaimer-icon svg { display: block; width: 100%; height: 100%; }
+
+#disclaimer-banner .disclaimer-body {
+  max-width: 78ch;
+  text-align: start;
+}
+
+#disclaimer-text {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--c-warning-text);
+}
+
+/* ---- App header — institutional navy with a seal-gold underline ---- */
 #app-header {
-  background-color: var(--c-primary);
+  background: linear-gradient(180deg, var(--c-ink-2) 0%, var(--c-ink) 100%);
   color: var(--c-text-inverse);
-  padding: 14px 24px;
+  padding: 15px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  box-shadow: var(--shadow-sm);
+  border-bottom: 3px solid var(--c-gold);
+  box-shadow: var(--shadow-md);
 }
 
 #app-header .brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 #app-header .brand-icon {
-  width: 34px;
-  height: 34px;
-  background: rgba(255,255,255,.2);
-  border-radius: 8px;
+  width: 40px;
+  height: 40px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(198,161,75,.55);
+  border-radius: 9px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.1rem;
+  font-size: 1.25rem;
+  color: var(--c-gold);
   flex-shrink: 0;
 }
 
 #app-header h1 {
-  font-size: 1.1rem;
+  font-family: var(--font-serif);
+  font-size: 1.3rem;
   font-weight: 700;
-  letter-spacing: -0.01em;
-  line-height: 1.2;
+  letter-spacing: 0.01em;
+  line-height: 1.15;
 }
 
 #app-header .subtitle {
-  font-size: 0.72rem;
-  opacity: 0.8;
+  font-size: 0.7rem;
+  opacity: 0.78;
   display: block;
-  font-weight: 400;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-top: 2px;
 }
 
 /* Language selector */
@@ -213,56 +262,61 @@ body {
 .card {
   background: var(--c-surface);
   border: 1px solid var(--c-border);
+  border-top: 3px solid var(--c-primary);
   border-radius: var(--radius-lg);
-  padding: 28px 28px 24px;
-  box-shadow: var(--shadow-sm);
+  padding: 28px 28px 26px;
+  box-shadow: var(--shadow-md);
 }
 
 .screen-heading {
-  font-size: 1.4rem;
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--c-text);
-  margin-bottom: 4px;
-  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+  letter-spacing: 0;
 }
 
 .screen-subheading {
-  font-size: 0.875rem;
+  font-size: 0.9rem;
   color: var(--c-text-muted);
-  margin-bottom: 20px;
-  line-height: 1.5;
+  margin-bottom: 22px;
+  line-height: 1.55;
 }
 
 /* Privacy notice */
 .privacy-notice {
   background: var(--c-primary-light);
-  border: 1px solid #b8d1ee;
+  border: 1px solid #c2d6ee;
+  border-inline-start: 4px solid var(--c-primary);
   border-radius: var(--radius-md);
-  padding: 12px 16px;
-  margin-bottom: 20px;
+  padding: 13px 16px;
+  margin-bottom: 22px;
   display: flex;
-  gap: 10px;
+  gap: 11px;
   align-items: flex-start;
 }
 
 .privacy-icon {
-  font-size: 1rem;
+  font-size: 1.05rem;
+  line-height: 1.3;
   flex-shrink: 0;
-  margin-top: 1px;
+  color: var(--c-primary-dark);
 }
 
 .privacy-notice strong {
   display: block;
   font-size: 0.82rem;
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: 0.02em;
   color: var(--c-primary-dark);
-  margin-bottom: 2px;
+  margin-bottom: 3px;
 }
 
 .privacy-notice p {
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   color: var(--c-primary-dark);
-  line-height: 1.45;
+  line-height: 1.5;
 }
 
 /* Form fields */
@@ -292,8 +346,9 @@ body {
 }
 
 .form-field label {
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
   color: var(--c-text);
 }
 
@@ -307,14 +362,20 @@ body {
 .form-field textarea,
 .form-field select {
   border: 1.5px solid var(--c-border);
-  border-radius: var(--radius-sm);
-  padding: 10px 12px;
-  font-size: 0.9rem;
+  border-radius: var(--radius-md);
+  padding: 11px 13px;
+  font-size: 0.92rem;
   font-family: inherit;
   color: var(--c-text);
-  background: #fff;
-  transition: border-color var(--transition), box-shadow var(--transition);
+  background: var(--c-surface-alt);
+  transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
   width: 100%;
+}
+
+.form-field input:hover,
+.form-field textarea:hover,
+.form-field select:hover {
+  border-color: #bcc7d6;
 }
 
 .form-field input:focus,
@@ -322,7 +383,8 @@ body {
 .form-field select:focus {
   outline: none;
   border-color: var(--c-primary);
-  box-shadow: 0 0 0 3px rgba(29,95,166,.15);
+  background: var(--c-surface);
+  box-shadow: 0 0 0 3px rgba(22,84,143,.16);
 }
 
 .form-field input::placeholder,
@@ -465,7 +527,8 @@ body {
 }
 
 .chat-title {
-  font-size: 1.05rem;
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
   font-weight: 700;
   color: var(--c-text);
 }
@@ -770,7 +833,8 @@ body {
 }
 
 .resources-header h2 {
-  font-size: 1.15rem;
+  font-family: var(--font-serif);
+  font-size: 1.22rem;
   font-weight: 700;
   color: var(--c-text);
 }
@@ -827,9 +891,10 @@ body {
   display: flex;
   flex-direction: column;
   gap: 3px;
-  padding: 10px 14px;
-  background: var(--c-bg);
+  padding: 11px 14px;
+  background: var(--c-surface-alt);
   border: 1px solid var(--c-border-light);
+  border-inline-start: 3px solid var(--c-primary);
   border-radius: var(--radius-md);
   transition: border-color var(--transition), box-shadow var(--transition);
 }
@@ -1055,7 +1120,7 @@ body {
   border: 1px solid var(--c-border-light);
   border-radius: var(--radius-md);
   padding: 10px 12px;
-  background: var(--c-bg);
+  background: var(--c-surface-alt);
   cursor: pointer;
   transition: border-color var(--transition), box-shadow var(--transition);
 }
@@ -1134,7 +1199,8 @@ body {
 .lang-gate-header { text-align: center; }
 .lang-gate-globe { font-size: 2rem; line-height: 1; }
 #lang-gate-title {
-  font-size: 1.25rem;
+  font-family: var(--font-serif);
+  font-size: 1.3rem;
   font-weight: 700;
   color: var(--c-text);
   margin-top: 4px;
@@ -1157,7 +1223,7 @@ body {
 #lang-gate-search:focus {
   outline: none;
   border-color: var(--c-primary);
-  box-shadow: 0 0 0 3px rgba(29,95,166,.15);
+  box-shadow: 0 0 0 3px rgba(22,84,143,.16);
 }
 
 #lang-gate-list {
@@ -1178,7 +1244,7 @@ body {
   align-items: flex-start;
   gap: 1px;
   text-align: start;
-  background: var(--c-bg);
+  background: var(--c-surface-alt);
   border: 1.5px solid var(--c-border-light);
   border-radius: var(--radius-md);
   padding: 9px 12px;
@@ -1242,6 +1308,40 @@ body {
 [dir="rtl"] #global-error button {
   margin-left: 0;
   margin-right: auto;
+}
+
+/* ---- Footer — restates the legal notice for institutional weight ---- */
+#app-footer {
+  background: var(--c-ink);
+  color: rgba(255,255,255,.78);
+  border-top: 3px solid var(--c-gold);
+  padding: 18px 24px 22px;
+  margin-top: auto;
+}
+
+.footer-inner {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: center;
+}
+
+.footer-brand {
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.01em;
+}
+
+#footer-note {
+  font-size: 0.76rem;
+  line-height: 1.5;
+  color: rgba(255,255,255,.72);
+  max-width: 76ch;
+  margin: 0 auto;
 }
 
 /* ---- Utility ---- */

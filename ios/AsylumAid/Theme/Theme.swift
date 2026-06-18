@@ -12,31 +12,39 @@ extension Color {
         )
     }
 
-    static let aaBg            = Color(hex: 0xf5f6f8)
+    static let aaBg            = Color(hex: 0xeef1f6)
     static let aaSurface       = Color(hex: 0xffffff)
-    static let aaBorder        = Color(hex: 0xd8dde6)
-    static let aaBorderLight   = Color(hex: 0xe8ecf2)
+    static let aaSurfaceAlt    = Color(hex: 0xf6f8fb) // subtle inset surface
+    static let aaBorder        = Color(hex: 0xd2dae6)
+    static let aaBorderLight   = Color(hex: 0xe5eaf1)
 
-    static let aaPrimary       = Color(hex: 0x1d5fa6) // deep trustworthy blue
-    static let aaPrimaryDark   = Color(hex: 0x154d8a)
-    static let aaPrimaryLight  = Color(hex: 0xdce8f7)
+    static let aaInk           = Color(hex: 0x0c2742) // institutional navy (header/footer)
+    static let aaInk2          = Color(hex: 0x103253)
 
-    static let aaAccent        = Color(hex: 0x2e7d52) // calm green for positive actions
-    static let aaAccentDark    = Color(hex: 0x245f3e)
-    static let aaAccentLight   = Color(hex: 0xd4eddf)
+    static let aaPrimary       = Color(hex: 0x16548f) // deep trustworthy blue
+    static let aaPrimaryDark   = Color(hex: 0x0f3d6b)
+    static let aaPrimaryLight  = Color(hex: 0xe2ecf7)
 
-    static let aaWarningBg     = Color(hex: 0xfff8e6)
-    static let aaWarningBorder = Color(hex: 0xe5c000)
-    static let aaWarningText   = Color(hex: 0x7a5700)
+    static let aaGold          = Color(hex: 0xc6a14b) // seal gold (official accent)
+    static let aaGoldDark      = Color(hex: 0xa8842f)
 
-    static let aaErrorBg       = Color(hex: 0xfdf2f2)
-    static let aaErrorBorder   = Color(hex: 0xd94f4f)
-    static let aaErrorText     = Color(hex: 0x8b1c1c)
+    static let aaAccent        = Color(hex: 0x1f7a4d) // measured green for positive actions
+    static let aaAccentDark    = Color(hex: 0x155e3a)
+    static let aaAccentLight   = Color(hex: 0xd9efe2)
 
-    static let aaText          = Color(hex: 0x1a1f2e)
-    static let aaTextMuted     = Color(hex: 0x4e5868)
+    static let aaWarningBg     = Color(hex: 0xfdf6e3)
+    static let aaWarningBorder = Color(hex: 0xd4a017)
+    static let aaWarningStrong = Color(hex: 0xb07d12)
+    static let aaWarningText   = Color(hex: 0x6e4f08)
 
-    static let aaChatUserBg    = Color(hex: 0x1d5fa6)
+    static let aaErrorBg       = Color(hex: 0xfdf1f1)
+    static let aaErrorBorder   = Color(hex: 0xcf4040)
+    static let aaErrorText     = Color(hex: 0x8a1c1c)
+
+    static let aaText          = Color(hex: 0x16202e)
+    static let aaTextMuted     = Color(hex: 0x51607a)
+
+    static let aaChatUserBg    = Color(hex: 0x16548f)
     static let aaChatAIBg      = Color(hex: 0xffffff)
 }
 
@@ -54,12 +62,13 @@ struct AccentButtonStyle: ButtonStyle {
         configuration.label
             .font(.system(size: 16, weight: .bold))
             .foregroundColor(.white)
-            .padding(.vertical, 12)
+            .padding(.vertical, 13)
             .padding(.horizontal, 24)
             .frame(maxWidth: .infinity)
             .background(disabled ? Color.aaAccent.opacity(0.5)
                                  : (configuration.isPressed ? Color.aaAccentDark : Color.aaAccent))
             .clipShape(RoundedRectangle(cornerRadius: Metrics.radiusMd, style: .continuous))
+            .shadow(color: Color.aaAccentDark.opacity(disabled ? 0 : 0.28), radius: 6, x: 0, y: 2)
     }
 }
 
@@ -69,12 +78,12 @@ struct SecondaryButtonStyle: ButtonStyle {
         configuration.label
             .font(.system(size: 14, weight: .semibold))
             .foregroundColor(.aaPrimary)
-            .padding(.vertical, 8)
-            .padding(.horizontal, 14)
+            .padding(.vertical, 9)
+            .padding(.horizontal, 15)
             .background(configuration.isPressed ? Color.aaPrimaryLight : Color.aaSurface)
             .overlay(
                 RoundedRectangle(cornerRadius: Metrics.radiusMd, style: .continuous)
-                    .stroke(Color.aaPrimary.opacity(0.4), lineWidth: 1)
+                    .stroke(Color.aaPrimary.opacity(0.55), lineWidth: 1.5)
             )
             .clipShape(RoundedRectangle(cornerRadius: Metrics.radiusMd, style: .continuous))
     }

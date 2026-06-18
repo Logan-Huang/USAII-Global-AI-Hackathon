@@ -30,7 +30,7 @@ struct IntakeFormView: View {
                         .foregroundColor(.aaTextMuted)
                 } header: {
                     Text(app.t("intakeHeading"))
-                        .font(.system(size: 18, weight: .bold))
+                        .font(.system(size: 20, weight: .bold, design: .serif))
                         .foregroundColor(.aaText)
                         .textCase(nil)
                 }

@@ -50,6 +50,7 @@
 
   function cacheDOMRefs() {
     DOM.disclaimerText    = document.getElementById("disclaimer-text");
+    DOM.footerNote        = document.getElementById("footer-note");
     DOM.langSelector      = document.getElementById("lang-selector");
     DOM.langSelectorLabel = document.getElementById("lang-selector-label");
     DOM.intakeScreen      = document.getElementById("intake-screen");
@@ -301,8 +302,9 @@
       document.documentElement.setAttribute("lang", lang);
     }
 
-    // Disclaimer
+    // Disclaimer (banner + footer reiteration)
     DOM.disclaimerText.textContent = t("disclaimer");
+    if (DOM.footerNote) DOM.footerNote.textContent = t("disclaimer");
 
     // Header
     DOM.langSelectorLabel.textContent = t("languageLabel");
