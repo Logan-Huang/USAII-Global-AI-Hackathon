@@ -56,6 +56,12 @@ async function fetchWithTimeout(url, opts = {}, ms = 15000) {
 }
 
 // Geocode a place name / city into coordinates.
+//
+// Open-Meteo only matches on the place NAME, ignoring any region/country the
+// user typed after a comma. Searching "Paris, Texas" for just "Paris" would
+// return Paris, France (highest population). To seek the RIGHT place we fetch
+// several candidates and rank them against the region/country context (the
+// tokens after the first comma) the user supplied.
 async function geocode(query) {
   const q = String(query || '').trim().slice(0, 200);
   if (!q) return null;
@@ -63,19 +69,27 @@ async function geocode(query) {
   const cached = geoCache.get(key);
   if (cached !== null) return cached || null; // `false` = cached miss
 
-  // Open-Meteo matches on a place name; use the part before any comma as the
-  // search term but keep the full text for display.
-  const name = q.split(',')[0].trim() || q;
+  const parts = q.split(',').map((s) => s.trim()).filter(Boolean);
+  const name = parts[0] || q;
+  // Region/country hints the user added after the city (e.g. "Texas", "USA").
+  const hints = parts.slice(1).map((s) => s.toLowerCase());
+
   const url =
-    GEOCODER + '?count=1&format=json&language=en&name=' + encodeURIComponent(name);
+    GEOCODER + '?count=10&format=json&language=en&name=' + encodeURIComponent(name);
   const res = await fetchWithTimeout(url, { headers: { Accept: 'application/json' } });
   if (!res.ok) throw new Error('geocode_http_' + res.status);
   const data = await res.json();
-  const r = data && data.results && data.results[0];
-  if (!r) {
+  const results = (data && data.results) || [];
+  if (!results.length) {
     geoCache.set(key, false); // cache the miss
     return null;
   }
+
+  // Score each candidate by how many of the user's hints it matches. Open-Meteo
+  // already returns results best-first (by relevance/population), so we keep that
+  // order as the tie-breaker by only replacing the best when a LATER result
+  // scores strictly higher.
+  const r = hints.length ? pickBestMatch(results, hints) : results[0];
   const out = {
     lat: r.latitude,
     lon: r.longitude,
@@ -83,6 +97,38 @@ async function geocode(query) {
   };
   geoCache.set(key, out);
   return out;
+}
+
+// Rank geocoder candidates against the region/country hints the user typed.
+function matchScore(r, hints) {
+  const hay = [r.country, r.country_code, r.admin1, r.admin2, r.admin3]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+  let score = 0;
+  for (const h of hints) {
+    if (!h) continue;
+    // A 2-letter token that equals the ISO country code is a strong signal.
+    if (h.length === 2 && r.country_code && h === String(r.country_code).toLowerCase()) {
+      score += 2;
+    } else if (hay.indexOf(h) !== -1) {
+      score += 1;
+    }
+  }
+  return score;
+}
+
+function pickBestMatch(results, hints) {
+  let best = results[0];
+  let bestScore = matchScore(results[0], hints);
+  for (let i = 1; i < results.length; i++) {
+    const s = matchScore(results[i], hints);
+    if (s > bestScore) {
+      best = results[i];
+      bestScore = s;
+    }
+  }
+  return best;
 }
 
 function categoryOf(tags) {
@@ -123,10 +169,10 @@ async function places(lat, lon, radius) {
   if (cached) return cached;
 
   const ql =
-    '[out:json][timeout:25];(' +
+    '[out:json][timeout:20];(' +
     `nwr["office"~"ngo|charity|lawyer"](around:${r},${la},${lo});` +
     `nwr["amenity"~"social_facility|community_centre"](around:${r},${la},${lo});` +
-    ');out center tags 80;';
+    ');out center tags 60;';
 
   // Race all mirrors; the first one to return wins. Overpass instances vary a
   // lot in load/latency, so racing is far more reliable than trying in series.

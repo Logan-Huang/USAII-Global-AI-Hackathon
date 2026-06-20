@@ -956,10 +956,11 @@
 
   var mapState = { map: null, layer: null, initialized: false, abort: null, retry: null };
 
-  // Search rings (metres). If nothing is found close by we automatically widen
-  // the radius before telling the user "nothing nearby" — important for users in
-  // less-densely-mapped suburban/rural areas where help may be 10–20 km away.
-  var PLACES_RADII = [8000, 16000, 25000];
+  // Search rings (metres). Each ring is a full Overpass round-trip, so we keep
+  // them few: a generous 12 km first pass covers most urban + suburban cases in
+  // ONE request, and we only widen to 25 km for genuinely sparse/rural areas
+  // before telling the user "nothing nearby".
+  var PLACES_RADII = [12000, 25000];
 
   // Status line under the header. When `retryFn` is given, a "Try again" button
   // is appended (used on errors so the user is never left at a dead end).
@@ -1197,20 +1198,35 @@
 
   function useMyLocation() {
     var t = function (key) { return i18n.t(state.lang, key); };
-    if (!navigator.geolocation) { setMapStatus(t("mapError"), true); return; }
     mapState.retry = useMyLocation;
+    if (!navigator.geolocation) { geoFallback(); return; }
     setMapStatus("", false);
     showMapLoading(t("mapSearching"));
     renderMapSkeletons(4);
     navigator.geolocation.getCurrentPosition(
       function (pos) {
         var la = pos.coords.latitude, lo = pos.coords.longitude;
-        if (mapState.map) mapState.map.setView([la, lo], 13);
+        if (mapState.map) mapState.map.setView([la, lo], 14);
         loadPlaces(la, lo, freshMapAbort());
       },
-      function () { hideMapLoading(); setMapStatus(t("mapError"), true, useMyLocation); },
-      { enableHighAccuracy: false, timeout: 10000, maximumAge: 600000 }
+      // If the browser blocks or can't get a fix, don't dead-end: fall back to
+      // the city the user already gave us so they still see nearby help.
+      geoFallback,
+      // enableHighAccuracy + a fresh fix (small maximumAge) so "near me" actually
+      // centres on where the user is, not a stale fix from a previous location.
+      { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 }
     );
+  }
+
+  // Geolocation unavailable/denied/timed out: search the profile city instead,
+  // or surface a clear error + retry if we have no location to fall back to.
+  function geoFallback() {
+    var t = function (key) { return i18n.t(state.lang, key); };
+    var query =
+      (state.profile && (state.profile.currentLocation || state.profile.countryOfAsylum)) || "";
+    if (query) { centerByQuery(query); return; }
+    hideMapLoading();
+    setMapStatus(t("mapError"), true, useMyLocation);
   }
 
   /* =========================================================
