@@ -20,7 +20,6 @@ Before submitting, the team must complete the following:
   - Team member 1: Yuvraj Manchanda
   - Team member 2: Logan Huang
   - Team member 3: Rohan Bhamidipati
-  - Team member 4: Finn Gorsline
 
 ---
 
